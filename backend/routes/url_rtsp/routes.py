@@ -1,10 +1,10 @@
 from flask import jsonify, request
-from . import add_url_rtsp  # Importando o Blueprint definido no __init__.py
+from . import url_rtsp  # Importando o Blueprint definido no __init__.py
 from rtsp_core import test_url_rtsp
 from extensions.extensions import db
 from .models import UrlRtsp
 
-@add_url_rtsp.route('/create', methods=['POST'])
+@url_rtsp.route('/create', methods=['POST'])
 def create():
 
     #obter json enviado no corpo da requisição
@@ -47,7 +47,7 @@ def create():
     return mounted_url_rtsp, 200
 
 # Rota para listar todas as URLs RTSP
-@add_url_rtsp.route('/list-all', methods=['GET'])
+@url_rtsp.route('/list-all', methods=['GET'])
 def list():
     urls = db.session.query(UrlRtsp).all()
     # Converte a lista de objetos em um formato de dicionário
@@ -66,7 +66,7 @@ def list():
     return jsonify(urls_data), 200
 
 # Rota para listar uma URL RTSP específica
-@add_url_rtsp.route('/list/<int:id>', methods=['GET'])
+@url_rtsp.route('/list/<int:id>', methods=['GET'])
 def list_one(id):
     url = db.session.query(UrlRtsp).filter(UrlRtsp.id == id).first()
     if not url:
@@ -86,7 +86,7 @@ def list_one(id):
     return jsonify(url_data), 200
 
 # Rota para deletar uma URL RTSP específica
-@add_url_rtsp.route('/delete/<int:id>', methods=['DELETE'])
+@url_rtsp.route('/delete/<int:id>', methods=['DELETE'])
 def delete(id):
     url = db.session.query(UrlRtsp).filter(UrlRtsp.id == id).first()
     if not url:
@@ -101,7 +101,7 @@ def delete(id):
     return jsonify({"message": "URL RTSP deletada com sucesso"}), 200
 
 # Rota para atualizar uma URL RTSP específica
-@add_url_rtsp.route('/update/<int:id>', methods=['PUT'])
+@url_rtsp.route('/update/<int:id>', methods=['PUT'])
 def update(id):
     url = db.session.query(UrlRtsp).filter(UrlRtsp.id == id).first()
     if not url:

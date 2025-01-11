@@ -1,8 +1,8 @@
 from flask import Flask
 from sqlalchemy import text  # Importa text para criar consultas SQL
 from extensions.extensions import db
-from routes.add_url_rtsp import add_url_rtsp
-from routes.add_url_rtsp.models import UrlRtsp 
+from routes.url_rtsp import url_rtsp
+from routes.url_rtsp.models import UrlRtsp 
 
 # create the Flask app
 
@@ -33,4 +33,4 @@ test_db_connection()
 with app.app_context():
     db.create_all()  # Cria as tabelas se não existirem
 
-app.register_blueprint(add_url_rtsp, url_prefix='/add_url_rtsp')
+app.register_blueprint(url_rtsp, url_prefix='/url_rtsp')
