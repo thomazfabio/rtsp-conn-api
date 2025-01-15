@@ -135,3 +135,20 @@ def update(id):
         print("Success: Video opened.")
     # Exemplo de rota para criar uma URL RTSP
     return mounted_url_rtsp, 200
+
+#rota para testar a url enviada pelo usuario
+@url_rtsp.route('/teste_url', methods=['POST'])
+def teste():
+
+    #obter json enviado no corpo da requisição
+    data = request.get_json()
+    url_rtsp = data['url']
+    # Testando a URL RTSP
+    sucess = test_url_rtsp.test_url_rtsp(url_rtsp)
+    print(sucess)
+    if  sucess:
+        print("  Success: Video opened.")
+        return jsonify({"status": "online"}), 200
+    else:
+        print(f"Error: Could not open video.")
+        return jsonify({"status": "error"}), 200

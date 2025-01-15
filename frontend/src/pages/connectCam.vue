@@ -2,11 +2,11 @@
   <v-container>
     <v-row>
       <v-col xl="8">
-        <h1>Assistente para conectar câmeras a api via RTSP</h1>
+        <h1>Assistente para conectar câmera via RTSP a api</h1>
       </v-col>
     </v-row>
     <v-row>
-      <v-col xl="8">
+      <v-col cols="12" xl="8">
         <ConnectAddCam/>
       </v-col>
     </v-row>
