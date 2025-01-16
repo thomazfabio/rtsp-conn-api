@@ -156,22 +156,7 @@
                   selectedDeviceType === 'DVR' &&
                   deviceFullInfo.fabricante === 'Intelbras'
                 "
-                >{{
-                  protocolCkeckBox[0].toLowerCase() +
-                  "://" +
-                  deviceFullInfo.user +
-                  ":" +
-                  deviceFullInfo.pass +
-                  "@" +
-                  deviceFullInfo.ip +
-                  ":" +
-                  deviceFullInfo.porta +
-                  "/" +
-                  deviceFullInfo.path +
-                  "?channel=" +
-                  deviceFullInfo.channel +
-                  "&subtype=1"
-                }}</span
+                >{{ fullUrl }}</span
               >
             </v-col>
           </v-row>
@@ -187,6 +172,7 @@
           <v-row class="mt-2">
             <v-col>
               <v-btn variant="outlined" color="yellow-darken-2"
+              @click="teste_url"
                 >Testar URL</v-btn
               >
             </v-col>
@@ -210,8 +196,9 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
-import { red } from "vuetify/util/colors";
+import { computed, onMounted, ref } from "vue";
+import { useCamUrlMenageStore} from "../stores/camUrlMenage";
+const storeCamUrlMenage = useCamUrlMenageStore();
 
 const disabledControl = computed(() => {
   if (step.value === 1 && selectedDeviceType.value === null) return true; // Desabilita o botão "Anterior" no primeiro passo
@@ -239,6 +226,25 @@ const deviceFullInfo = ref({
   channel: null,
   user: null,
   pass: null,
+});
+
+const fullUrl = computed(() => {
+  return (
+    protocolCkeckBox.value[0].toLowerCase() +
+    "://" +
+    deviceFullInfo.value.user +
+    ":" +
+    deviceFullInfo.value.pass +
+    "@" +
+    deviceFullInfo.value.ip +
+    ":" +
+    deviceFullInfo.value.porta +
+    "/" +
+    deviceFullInfo.value.path +
+    "?channel=" +
+    deviceFullInfo.value.channel +
+    "&subtype=1"
+  );
 });
 
 // Funções para navegação
@@ -273,10 +279,27 @@ const models = computed(() => {
 });
 
 //dados e fuunões do passo 3
-const statusUrl = ref({
-  status: "pendente",
-  error: null,
-  tagColor: "yellow"
-});
+
+    // Computed para observar diretamente o valor reativo da store
+    const statusUrl = computed(() => {
+      const statusCam = storeCamUrlMenage.cam.status;
+      if (statusCam === "pendente") {
+        return { status: "pendente", tagColor: "yellow" };
+      }
+      if (statusCam === "online") {
+        return { status: "online", tagColor: "success" };
+      }
+      if (statusCam === "error") {
+        return { status: "falha", tagColor: "error" };
+      }
+      return { status: "", tagColor: "" };
+    });
+
+    // Realiza alguma lógica ao montar
+    onMounted(() => {
+      console.log("Status inicial:", statusUrl.value.status);
+    });
+
+const teste_url = () => storeCamUrlMenage.testeUrlRtsp(fullUrl.value);
 
 </script>

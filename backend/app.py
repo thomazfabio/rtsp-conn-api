@@ -3,10 +3,13 @@ from sqlalchemy import text  # Importa text para criar consultas SQL
 from extensions.extensions import db
 from routes.url_rtsp import url_rtsp
 from routes.url_rtsp.models import UrlRtsp 
+from flask_cors import CORS
 
 # create the Flask app
 
 app = Flask(__name__)
+
+CORS(app)  # Configura o CORS para todas as rotas
 
 # configure the MariaDb database
 app.config["SQLALCHEMY_DATABASE_URI"] = "mariadb+mariadbconnector://fabio:root@127.0.0.1:3306/rtsp_conn_api"
