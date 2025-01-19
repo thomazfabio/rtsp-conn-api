@@ -5,7 +5,7 @@
       <!-- Itens do menu -->
       <v-list>
         <v-list-item prepend-icon="mdi-home" title="Home" to="/" />
-        <v-list-item prepend-icon="mdi-eye" title="Visualizar" to="" />
+        <v-list-item prepend-icon="mdi-eye" title="Visualizar" to="/camVisualizer" />
         <v-list-item
           prepend-icon="mdi-cctv"
           title="Adicionar câmera"

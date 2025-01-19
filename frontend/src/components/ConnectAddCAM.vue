@@ -163,7 +163,7 @@
           <v-divider />
           <v-row class="mt-1">
             <v-col>
-              <v-chip class="" :color='statusUrl.tagColor' label>
+              <v-chip class="" :color="statusUrl.tagColor" label>
                 <v-icon icon="mdi-label" start></v-icon>
                 {{ statusUrl.status }}
               </v-chip></v-col
@@ -171,8 +171,10 @@
           </v-row>
           <v-row class="mt-2">
             <v-col>
-              <v-btn variant="outlined" color="yellow-darken-2"
-              @click="teste_url"
+              <v-btn
+                variant="outlined"
+                color="yellow-darken-2"
+                @click="teste_url"
                 >Testar URL</v-btn
               >
             </v-col>
@@ -182,7 +184,35 @@
     </template>
 
     <template v-slot:item.4>
-      <v-card title="Passo 4" flat>Conteúdo do Passo 4...</v-card>
+      <v-card title="Finalize e salve as configurações" flat>
+        <v-container>
+          <v-row>
+            <v-col>
+              <v-divider class="mb-4" />
+              <v-btn color="primary" prepend-icon="mdi-play-speed">play video</v-btn>
+              <v-divider class="mb-4 mt-4" />
+              <v-form>
+                <v-text-field
+                  variant="outlined"
+                  label="Nome da Câmera"
+                  density="compact"
+                ></v-text-field>
+                <v-text-field
+                  variant="outlined"
+                  label="Grupo / Local"
+                  density="compact"
+                ></v-text-field>
+              </v-form>
+              <v-divider class="mb-4" />
+              <v-btn color="primary" prepend-icon="mdi-content-save-cog-outline">salvar configurações</v-btn>
+              <v-divider class="mb-4 mt-4" />
+            </v-col>
+            <v-col>
+              <simpleCamVizualizer />
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card>
     </template>
 
     <v-stepper-actions
@@ -197,7 +227,8 @@
 
 <script setup>
 import { computed, onMounted, ref } from "vue";
-import { useCamUrlMenageStore} from "../stores/camUrlMenage";
+import { useCamUrlMenageStore } from "../stores/camUrlMenage";
+import simpleCamVizualizer from "./camVizualizer/camSimpleVisualizer.vue";
 const storeCamUrlMenage = useCamUrlMenageStore();
 
 const disabledControl = computed(() => {
@@ -280,26 +311,25 @@ const models = computed(() => {
 
 //dados e fuunões do passo 3
 
-    // Computed para observar diretamente o valor reativo da store
-    const statusUrl = computed(() => {
-      const statusCam = storeCamUrlMenage.cam.status;
-      if (statusCam === "pendente") {
-        return { status: "pendente", tagColor: "yellow" };
-      }
-      if (statusCam === "online") {
-        return { status: "online", tagColor: "success" };
-      }
-      if (statusCam === "error") {
-        return { status: "falha", tagColor: "error" };
-      }
-      return { status: "", tagColor: "" };
-    });
+// Computed para observar diretamente o valor reativo da store
+const statusUrl = computed(() => {
+  const statusCam = storeCamUrlMenage.cam.status;
+  if (statusCam === "pendente") {
+    return { status: "pendente", tagColor: "yellow" };
+  }
+  if (statusCam === "online") {
+    return { status: "online", tagColor: "success" };
+  }
+  if (statusCam === "error") {
+    return { status: "falha", tagColor: "error" };
+  }
+  return { status: "", tagColor: "" };
+});
 
-    // Realiza alguma lógica ao montar
-    onMounted(() => {
-      console.log("Status inicial:", statusUrl.value.status);
-    });
+// Realiza alguma lógica ao montar
+onMounted(() => {
+  console.log("Status inicial:", statusUrl.value.status);
+});
 
 const teste_url = () => storeCamUrlMenage.testeUrlRtsp(fullUrl.value);
-
 </script>

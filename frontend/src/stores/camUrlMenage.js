@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import api_url_rtsp from "@/services/api";
+import { api_url_rtsp , api_url } from "../services/api";
+const api = api_url_rtsp;
 import { ref } from "vue";
 
 export const useCamUrlMenageStore = defineStore("cam-url-menage", () => {
@@ -19,7 +20,7 @@ export const useCamUrlMenageStore = defineStore("cam-url-menage", () => {
   }
   async function testeUrlRtsp(payload) {
     const url = { url: payload };
-    const status = await api_url_rtsp.post("/url_rtsp/teste_url", url);
+    const status = await api.post("/url_rtsp/teste_url", url);
     console.log(status.data);
     cam.value.status = status.data.status;
     return status;

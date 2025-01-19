@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask  
 from sqlalchemy import text  # Importa text para criar consultas SQL
 from extensions.extensions import db
 from routes.url_rtsp import url_rtsp
 from routes.url_rtsp.models import UrlRtsp 
+from routes.visualizer_cam import visualizer_cam
 from flask_cors import CORS
 
 # create the Flask app
@@ -10,6 +11,9 @@ from flask_cors import CORS
 app = Flask(__name__)
 
 CORS(app)  # Configura o CORS para todas as rotas
+
+
+
 
 # configure the MariaDb database
 app.config["SQLALCHEMY_DATABASE_URI"] = "mariadb+mariadbconnector://fabio:root@127.0.0.1:3306/rtsp_conn_api"
@@ -37,3 +41,4 @@ with app.app_context():
     db.create_all()  # Cria as tabelas se não existirem
 
 app.register_blueprint(url_rtsp, url_prefix='/url_rtsp')
+app.register_blueprint(visualizer_cam, url_prefix='/visualizer_cam')  # Registra o Blueprint com o prefixo /vizualizer_cam
