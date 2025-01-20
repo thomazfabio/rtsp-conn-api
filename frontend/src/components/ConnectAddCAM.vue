@@ -187,9 +187,19 @@
       <v-card title="Finalize e salve as configurações" flat>
         <v-container>
           <v-row>
-            <v-col>
+            <v-col cols="12" xl="5" lg="5" md="6" sm="8">
               <v-divider class="mb-4" />
-              <v-btn color="primary" prepend-icon="mdi-play-speed">play video</v-btn>
+              <v-row>
+                <v-col>
+                  <v-btn color="success" prepend-icon="mdi-play-speed" class="mr-3"
+                    >play video</v-btn
+                  >
+
+                  <v-btn color="red" prepend-icon="mdi-stop-circle-outline"
+                    >stop video</v-btn
+                  >
+                </v-col>
+              </v-row>
               <v-divider class="mb-4 mt-4" />
               <v-form>
                 <v-text-field
@@ -204,10 +214,18 @@
                 ></v-text-field>
               </v-form>
               <v-divider class="mb-4" />
-              <v-btn color="primary" prepend-icon="mdi-content-save-cog-outline">salvar configurações</v-btn>
+              <v-row>
+                <v-col class="">
+                  <v-btn
+                    color="primary"
+                    prepend-icon="mdi-content-save-cog-outline"
+                    >salvar configurações</v-btn
+                  >
+                </v-col>
+              </v-row>
               <v-divider class="mb-4 mt-4" />
             </v-col>
-            <v-col>
+            <v-col class="d-flex justify-center">
               <simpleCamVizualizer />
             </v-col>
           </v-row>

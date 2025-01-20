@@ -1,11 +1,11 @@
 <template>
   <v-card variant="tonal" class="pa-4 d-flex flex-row-reverse">
-    <div style="width: 640px">
+    <div style="width: 480px">
       <v-row>
-        <v-col cols="12">
+        <v-col cols="12" >
           <v-row>
             <v-col>
-              <span> Grupo / Local : {{ dadosStrening.grupo }} </span>
+              <span> Grupo : {{ dadosStrening.grupo }} </span>
             </v-col>
             <v-col>
               <span class="d-flex justify-center">
@@ -19,11 +19,14 @@
               >
             </v-col>
           </v-row>
-          <div style="width: 640px; height: 640px;">
+          <div >
             <div>
-    <h1>Stream de Vídeo</h1>
-    <img src="http://localhost:5000/visualizer_cam/simple">
- 
+              <!-- Conecta ao endpoint /stream sem passar a URL -->
+              <img
+                src="http://localhost:5000/visualizer_cam/stream"
+                alt="Stream ao vivo"
+                style="max-width: 100%; height: auto"
+              />
             </div>
           </div>
         </v-col>
@@ -41,6 +44,4 @@ const dadosStrening = ref({
   grupo: "Trabalho",
   camChennel: "1",
 });
-
-
 </script>
