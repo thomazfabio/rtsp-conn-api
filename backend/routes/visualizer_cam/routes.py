@@ -108,3 +108,4 @@ def stop_stream():
     except Exception as e:
         print(f"Erro ao encerrar o stream: {e}")
         return jsonify({"message": "Erro ao encerrar o stream."}), 500
+

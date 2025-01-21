@@ -4,6 +4,7 @@ from extensions.extensions import db
 from routes.url_rtsp import url_rtsp
 from routes.url_rtsp.models import UrlRtsp 
 from routes.visualizer_cam import visualizer_cam
+from routes.visualizer_cam_v2 import visualizer_cam_v2
 from flask_cors import CORS
 
 # create the Flask app
@@ -42,3 +43,4 @@ with app.app_context():
 
 app.register_blueprint(url_rtsp, url_prefix='/url_rtsp')
 app.register_blueprint(visualizer_cam, url_prefix='/visualizer_cam')  # Registra o Blueprint com o prefixo /vizualizer_cam
+app.register_blueprint(visualizer_cam_v2, url_prefix='/visualizer_cam_v2')  # Registra o Blueprint com o prefixo /vizualizer_cam_v2
