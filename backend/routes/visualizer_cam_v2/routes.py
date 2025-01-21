@@ -117,7 +117,7 @@ def stop_stream():
 @visualizer_cam_v2.route('/stream', methods=['GET'])
 def stream_video():
     """
-    Endpoint para transmitir o vídeo em MJPEG.
+    Endpoint para transmitir o vídeo em MJPEG com controle de taxa.
     """
     url = request.args.get('url')
     if not url:
@@ -128,12 +128,20 @@ def stream_video():
         return jsonify({"message": "Stream não encontrado. Use '/start_stream' primeiro."}), 404
 
     def generate():
+        fps_limit = 5  # Limitar a 10 frames por segundo (ajustável)
+        frame_interval = 1 / fps_limit
+        last_frame_time = time.time()
+
         while True:
             frame = stream.get_frame()
             if frame:
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                current_time = time.time()
+                if current_time - last_frame_time >= frame_interval:
+                    last_frame_time = current_time
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             else:
                 time.sleep(0.1)  # Aguarda até que um frame esteja disponível
 
     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
