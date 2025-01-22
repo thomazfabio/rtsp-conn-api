@@ -67,7 +67,7 @@ class VideoStream:
             ret, buffer = cv2.imencode('.jpg', frame)
             if ret:
                 self.buffer.append(buffer.tobytes())
-            time.sleep(0.03)  # Controla o consumo de CPU (ajustável)
+            time.sleep(0.00)  # Controla o consumo de CPU (ajustável)
 
     def get_frame(self):
         with self.lock:
@@ -128,7 +128,7 @@ def stream_video():
         return jsonify({"message": "Stream não encontrado. Use '/start_stream' primeiro."}), 404
 
     def generate():
-        fps_limit = 5  # Limitar a 10 frames por segundo (ajustável)
+        fps_limit = 15  # Limitar a 10 frames por segundo (ajustável)
         frame_interval = 1 / fps_limit
         last_frame_time = time.time()
 
