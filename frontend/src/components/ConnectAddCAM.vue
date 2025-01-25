@@ -12,13 +12,7 @@
             <v-col cols="6">
               <v-select
                 label="Selecione o tipo de dispositivo que deseja conectar"
-                :items="[
-                  'DVR',
-                  'Camera IP',
-                  'URL da Web',
-                  'Inserir manualmente',
-                  'Outro',
-                ]"
+                :items="['DVR', 'Camera IP', 'URL da Web']"
                 variant="outlined"
                 v-model="selectedDeviceType"
               ></v-select>
@@ -37,8 +31,12 @@
             <v-container>
               <!-- Configurações para DVR -->
               <v-row>
-                <v-col>
+                <v-col class="d-flex align-center" cols="auto">
+                  <span>Protocolo de conexão:</span>
+                </v-col>
+                <v-col cols="auto">
                   <v-checkbox
+                    class="d-flex align-center"
                     v-model="protocolCkeckBox"
                     label="RTSP"
                     value="RTSP"
@@ -77,7 +75,14 @@
                 </v-col>
               </v-row>
               <v-row>
-                <v-col cols="12" xl="2" lg="2" md="3" sm="3">
+                <v-col
+                  cols="12"
+                  xl="2"
+                  lg="2"
+                  md="3"
+                  sm="3"
+                  class="d-flex align-center"
+                >
                   <v-text-field
                     v-model="deviceFullInfo.porta"
                     label="Porta"
@@ -85,21 +90,39 @@
                     density="compact"
                   ></v-text-field>
                 </v-col>
-                <v-col>
+
+                <v-col class="d-flex align-center">
                   <v-text-field
                     v-model="deviceFullInfo.path"
-                    label="Path no Dispositivo ex: /minitorrealtime/cam"
+                    label="Path"
                     variant="outlined"
                     density="compact"
+                    :disabled="true"
                   ></v-text-field>
                 </v-col>
-                <v-col cols="12" xl="2" lg="2" md="2" sm="3">
+                <v-col
+                  cols="12"
+                  xl="3"
+                  lg="3"
+                  md="3"
+                  sm="3"
+                  class="d-flex align-center"
+                >
                   <v-text-field
                     v-model="deviceFullInfo.channel"
                     label="Numero do Canal ex: camera 4 o canal é 4"
                     variant="outlined"
                     density="compact"
                   ></v-text-field>
+                </v-col>
+                <v-col cols="auto">
+                  <v-checkbox
+                    v-model="preferedStream"
+                    label="Stream extra "
+                    color="info"
+                  >
+                  </v-checkbox>
+                  {{ deviceFullInfo.preferedStream }}
                 </v-col>
               </v-row>
               <v-row>
@@ -187,16 +210,52 @@
       <v-card title="Finalize e salve as configurações" flat>
         <v-container>
           <v-row>
+            <v-col cols="auto">
+              <Span>Sua URL: </Span>
+            </v-col>
+            <v-col>
+              <span
+                class="text-primary font-weight-bold"
+                v-if="
+                  selectedDeviceType === 'DVR' &&
+                  deviceFullInfo.fabricante === 'Intelbras'
+                "
+                >{{ fullUrl }}</span
+              >
+            </v-col>
+          </v-row>
+          <v-row>
             <v-col cols="12" xl="5" lg="5" md="6" sm="8">
               <v-divider class="mb-4" />
               <v-row>
                 <v-col>
-                  <v-btn color="success" prepend-icon="mdi-play-speed" class="mr-3"
-                    >play video</v-btn
+                  <v-btn
+                    color="info"
+                    prepend-icon="mdi-play-speed"
+                    stacked
+                    variant="outlined"
+                    class="w-75"
+                    >play</v-btn
                   >
-
-                  <v-btn color="red" prepend-icon="mdi-stop-circle-outline"
-                    >stop video</v-btn
+                </v-col>
+                <v-col class="d-flex justify-center">
+                  <v-btn
+                    color="red"
+                    prepend-icon="mdi-stop-circle-outline"
+                    stacked
+                    variant="outlined"
+                    class="w-75"
+                    >stop</v-btn
+                  >
+                </v-col>
+                <v-col class="d-flex justify-end">
+                  <v-btn
+                    color="yellow-darken-2"
+                    prepend-icon="mdi-refresh"
+                    stacked
+                    variant="outlined"
+                    class="w-75"
+                    >refresh</v-btn
                   >
                 </v-col>
               </v-row>
@@ -217,8 +276,10 @@
               <v-row>
                 <v-col class="">
                   <v-btn
-                    color="primary"
+                    color="green-darken-2"
                     prepend-icon="mdi-content-save-cog-outline"
+                    rounded="xl"
+                    variant="outlined"
                     >salvar configurações</v-btn
                   >
                 </v-col>
@@ -226,7 +287,7 @@
               <v-divider class="mb-4 mt-4" />
             </v-col>
             <v-col class="d-flex justify-center">
-              <simpleCamVizualizer />
+              <camSimpleVisualizer />
             </v-col>
           </v-row>
         </v-container>
@@ -239,25 +300,46 @@
       :disabled="disabledControl"
       @click:next="goToNextStep"
       @click:prev="goToPrevStep"
+      color="green"
     />
   </v-stepper>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useCamUrlMenageStore } from "../stores/camUrlMenage";
-import simpleCamVizualizer from "./camVizualizer/camSimpleVisualizer.vue";
+import camSimpleVisualizer from "./camVizualizer/camSimpleVisualizer.vue";
+import { de, tr } from "vuetify/locale";
 const storeCamUrlMenage = useCamUrlMenageStore();
 
 const disabledControl = computed(() => {
   if (step.value === 1 && selectedDeviceType.value === null) return true; // Desabilita o botão "Anterior" no primeiro passo
   if (step.value === 4) return "next"; // Desabilita o botão "Próximo" no último passo
+  if (step.value === 2 && protocolCkeckBox.value != "RTSP") return "next";
 });
 
 const step = ref(1); // Estado atual do passo
 const stepper = ref(null); // Referência ao v-stepper
 const selectedDeviceType = ref(null);
 const protocolCkeckBox = ref([]);
+const selectedManufacturer = ref(null);
+const selectedModel = ref(null);
+const preferedStream = ref(false);
+
+//observando mudanças
+watch([selectedManufacturer, selectedModel], ([newManufacturer, newModel]) => {
+  if (newManufacturer === "Intelbras" && newModel === "HDCVI 1004 G2") {
+    deviceFullInfo.value.path = "cam/realmonitor";
+  }
+});
+
+watch(preferedStream, (newVal) => {
+  if (newVal) {
+    deviceFullInfo.value.preferedStream = "1";
+  } else {
+    deviceFullInfo.value.preferedStream = "0";
+  }
+});
 
 // dados de imputs
 function updateFabricante(value) {
@@ -273,6 +355,7 @@ const deviceFullInfo = ref({
   porta: null,
   path: null,
   channel: null,
+  preferedStream: "0",
   user: null,
   pass: null,
 });
@@ -292,7 +375,8 @@ const fullUrl = computed(() => {
     deviceFullInfo.value.path +
     "?channel=" +
     deviceFullInfo.value.channel +
-    "&subtype=1"
+    "&subtype=" +
+    deviceFullInfo.value.preferedStream
   );
 });
 
@@ -307,17 +391,11 @@ const goToPrevStep = () => {
 
 //lidando com dvr passo 2
 // Lista de fabricantes
-const manufacturers = ["Intelbras", "Genérico", "Outro"];
-
-// Estado selecionado pelo usuário
-const selectedManufacturer = ref(null);
-const selectedModel = ref(null);
+const manufacturers = ["Intelbras"];
 
 // Modelos disponíveis por fabricante
 const modelsByManufacturer = {
-  Intelbras: ["HDCVI 1004 G2", "VIP 1120 B", "Mibo Cam"],
-  Genérico: ["Modelo Genérico 1", "Modelo Genérico 2"],
-  Outro: ["Modelo Personalizado"],
+  Intelbras: ["HDCVI 1004 G2"],
 };
 
 // Computed para modelos dinâmicos
