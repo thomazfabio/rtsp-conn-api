@@ -5,17 +5,17 @@
         <v-col cols="12" >
           <v-row>
             <v-col>
-              <span> Grupo : {{ dadosStrening.grupo }} </span>
+              <span> Grupo : {{ grupo }} </span>
             </v-col>
             <v-col>
               <span class="d-flex justify-center">
-                Câmera : {{ dadosStrening.camName }}</span
+                Câmera : {{ camName }}</span
               >
             </v-col>
 
             <v-col>
               <span class="d-flex flex-row-reverse">
-                Canal: : {{ dadosStrening.camChennel }}</span
+                Canal: : {{ camChennel }}</span
               >
             </v-col>
           </v-row>
@@ -23,10 +23,11 @@
             <div>
               <!-- Conecta ao endpoint /stream sem passar a URL -->
               <img
-                src="http://localhost:5000/visualizer_cam/stream"
+                :src="streaming"
                 alt="Stream ao vivo"
                 style="max-width: 100%; height: auto"
               />
+              {{ camUrl }}
             </div>
           </div>
         </v-col>
@@ -37,11 +38,12 @@
 
 <script setup>
 import { ref } from "vue";
-
-const dadosStrening = ref({
-  camUrl: "http://",
-  camName: "Cam 1",
-  grupo: "Trabalho",
-  camChennel: "1",
+import { defineProps } from "vue"; 
+const streaming = "http://localhost:5000/visualizer_cam_v2/stream?url=rtsp%3A%2F%2Fadmin%3A227802%40192.168.15.150%3A554%2Fcam%2Frealmonitor%3Fchannel%3D1%26subtype%3D0"
+const props = defineProps({
+  camUrl: String,
+  camName: String,
+  grupo: String,
+  camChennel: String,
 });
 </script>

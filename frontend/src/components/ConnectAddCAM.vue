@@ -211,7 +211,7 @@
         <v-container>
           <v-row>
             <v-col cols="auto">
-              <Span>Sua URL: </Span>
+              <span>Sua URL: </span>
             </v-col>
             <v-col>
               <span
@@ -287,7 +287,9 @@
               <v-divider class="mb-4 mt-4" />
             </v-col>
             <v-col class="d-flex justify-center">
-              <camSimpleVisualizer />
+              <camSimpleVisualizer 
+              :cam-url="fullUrl"
+              />
             </v-col>
           </v-row>
         </v-container>
@@ -309,7 +311,6 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useCamUrlMenageStore } from "../stores/camUrlMenage";
 import camSimpleVisualizer from "./camVizualizer/camSimpleVisualizer.vue";
-import { de, tr } from "vuetify/locale";
 const storeCamUrlMenage = useCamUrlMenageStore();
 
 const disabledControl = computed(() => {
