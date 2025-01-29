@@ -23,11 +23,10 @@
             <div>
               <!-- Conecta ao endpoint /stream sem passar a URL -->
               <img
-                :src="streaming"
+                :src="streamingURL"
                 alt="Stream ao vivo"
                 style="max-width: 100%; height: auto"
               />
-              {{ camUrl }}
             </div>
           </div>
         </v-col>
@@ -37,13 +36,22 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { defineProps } from "vue"; 
-const streaming = "http://localhost:5000/visualizer_cam_v2/stream?url=rtsp%3A%2F%2Fadmin%3A227802%40192.168.15.150%3A554%2Fcam%2Frealmonitor%3Fchannel%3D1%26subtype%3D0"
+import { ref, computed } from "vue";
+import { defineProps } from "vue";
+
+const baseURL = "http://localhost:5000";
+
 const props = defineProps({
   camUrl: String,
   camName: String,
   grupo: String,
   camChennel: String,
+  visualizerUrl: String,
+});
+
+// Gerar a URL de streaming corretamente
+const streamingURL = computed(() => {
+  return `${baseURL}${props.visualizerUrl}?url=${encodeURIComponent(props.camUrl)}`;
 });
 </script>
+

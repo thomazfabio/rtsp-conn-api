@@ -289,6 +289,7 @@
             <v-col class="d-flex justify-center">
               <camSimpleVisualizer 
               :cam-url="fullUrl"
+              :visualizer-url="'/visualizer_cam_v2/stream'"
               />
             </v-col>
           </v-row>
