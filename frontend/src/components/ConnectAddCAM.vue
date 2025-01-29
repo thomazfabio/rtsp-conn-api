@@ -235,6 +235,7 @@
                     stacked
                     variant="outlined"
                     class="w-75"
+                    @click="controleCamActions.startStream"
                     >play</v-btn
                   >
                 </v-col>
@@ -245,6 +246,7 @@
                     stacked
                     variant="outlined"
                     class="w-75"
+                    @click="controleCamActions.stopStream"
                     >stop</v-btn
                   >
                 </v-col>
@@ -262,11 +264,13 @@
               <v-divider class="mb-4 mt-4" />
               <v-form>
                 <v-text-field
+                  v-model="camData.camName"
                   variant="outlined"
                   label="Nome da Câmera"
                   density="compact"
                 ></v-text-field>
                 <v-text-field
+                  v-model="camData.grupo"
                   variant="outlined"
                   label="Grupo / Local"
                   density="compact"
@@ -287,9 +291,13 @@
               <v-divider class="mb-4 mt-4" />
             </v-col>
             <v-col class="d-flex justify-center">
-              <camSimpleVisualizer 
-              :cam-url="fullUrl"
-              :visualizer-url="'/visualizer_cam_v2/stream'"
+              <camSimpleVisualizer
+                :cam-url="fullUrl"
+                :visualizer-url="'/visualizer_cam_v2/stream'"
+                :cam-name="camData.camName"
+                :grupo="camData.grupo"
+                :cam-chennel="deviceFullInfo.channel"
+                ref="controleCam"
               />
             </v-col>
           </v-row>
@@ -350,6 +358,8 @@ function updateFabricante(value) {
 function updateModelo(value) {
   deviceFullInfo.value.modelo = value;
 }
+
+// Dados do dispositivo
 const deviceFullInfo = ref({
   fabricante: null,
   modelo: null,
@@ -362,6 +372,17 @@ const deviceFullInfo = ref({
   pass: null,
 });
 
+// dados do objeto camera para salvar "inclui dados de usuario"
+const camData = ref({
+  userId: null,
+  deviceId: null,
+  camName: null,
+  grupo: null,
+  camUrl: null,
+  camStatus: null,
+});
+
+// URL completa
 const fullUrl = computed(() => {
   return (
     protocolCkeckBox.value[0].toLowerCase() +
@@ -430,4 +451,15 @@ onMounted(() => {
 });
 
 const teste_url = () => storeCamUrlMenage.testeUrlRtsp(fullUrl.value);
+
+// lidando com controles do passo 4
+const controleCam = ref(null);
+const controleCamActions = {
+  stopStream: () => {
+    controleCam.value.stopStream();
+  },
+  startStream: () => {
+    controleCam.value.startStream();
+  },
+};
 </script>

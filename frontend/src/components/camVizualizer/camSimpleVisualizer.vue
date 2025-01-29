@@ -38,6 +38,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { defineProps } from "vue";
+import { defineExpose } from "vue";
 
 const baseURL = "http://localhost:5000";
 
@@ -47,6 +48,21 @@ const props = defineProps({
   grupo: String,
   camChennel: String,
   visualizerUrl: String,
+});
+
+// metodos de controle
+const stopStream = () => {
+  console.log("Parando stream");
+};
+
+const startStream = () => {
+  console.log("Iniciando stream");
+};
+
+// Expor metodos
+defineExpose({
+  stopStream,
+  startStream,
 });
 
 // Gerar a URL de streaming corretamente
