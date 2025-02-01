@@ -318,7 +318,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
-import { useCamUrlMenageStore } from "../stores/camUrlMenage";
+import { useCamUrlMenageStore } from "../stores/utils/camUrlMenage";
 import camSimpleVisualizer from "./camVizualizer/camSimpleVisualizer.vue";
 const storeCamUrlMenage = useCamUrlMenageStore();
 

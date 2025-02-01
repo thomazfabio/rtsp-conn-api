@@ -54,15 +54,26 @@ class VideoStream:
         return True
 
     def _read_frames(self):
+        fps = int(self.capture.get(cv2.CAP_PROP_FPS))  # Obtém FPS da câmera
+        frame_time = 1.0 / max(1, fps)  # Tempo esperado entre frames
+        last_frame_time = time.time()
         while self.running:
             with self.lock:
                 if not self.running:
                     break
-                ret, frame = self.capture.read()
+                
+                current_time = time.time()
+                if current_time - last_frame_time < frame_time:
+                 continue  # Aguarda o tempo correto antes de processar o próximo frame
+ 
+                
+            ret, frame = self.capture.read()
             if not ret:
                 print(f"Erro: Não foi possível ler o frame do stream {self.url}.")
                 time.sleep(2)  # Pausa antes de tentar novamente
                 continue
+               
+            last_frame_time = current_time  # Atualiza o tempo do último frame
             # Adiciona o frame ao buffer
             ret, buffer = cv2.imencode('.jpg', frame)
             if ret:
@@ -128,7 +139,7 @@ def stream_video():
         return jsonify({"message": "Stream não encontrado. Use '/start_stream' primeiro."}), 404
 
     def generate():
-        fps_limit = 15  # Limitar a 10 frames por segundo (ajustável)
+        fps_limit = 30  # Limitar a 10 frames por segundo (ajustável)
         frame_interval = 1 / fps_limit
         last_frame_time = time.time()
 

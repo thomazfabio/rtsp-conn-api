@@ -16,5 +16,4 @@
 <script setup>
 import ConnectAddCam from "../components/ConnectAddCAM.vue";
 import { ref, watch } from "vue";
-const selectedDeviceType = ref(null); // Estado gerenciado na página
 </script>
