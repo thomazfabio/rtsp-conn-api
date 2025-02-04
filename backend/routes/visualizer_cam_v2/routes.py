@@ -87,6 +87,9 @@ class VideoStream:
             self.thread.join()
         if self.capture and self.capture.isOpened():
             self.capture.release()
+        # Limpa o buffer para remover frames antigos
+        with self.lock:
+            self.buffer.clear()
 
 # Instância global do gerenciador de streams
 stream_manager = StreamManager()
