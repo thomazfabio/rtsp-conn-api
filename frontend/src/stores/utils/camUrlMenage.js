@@ -25,6 +25,8 @@ export const useCamUrlMenageStore = defineStore("cam-url-menage", () => {
     cam.value.status = status.data.status;
     return status;
   }
+
+
   return {
     cam,
     setCamUrl,

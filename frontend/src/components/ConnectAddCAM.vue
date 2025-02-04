@@ -284,6 +284,7 @@
                     prepend-icon="mdi-content-save-cog-outline"
                     rounded="xl"
                     variant="outlined"
+                    @click="saveCamData"
                     >salvar configurações</v-btn
                   >
                 </v-col>
@@ -319,8 +320,10 @@
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
 import { useCamUrlMenageStore } from "../stores/utils/camUrlMenage";
+import { useCreateCamFullDataStore } from "../stores/deviceManage/createCamFullData";
 import camSimpleVisualizer from "./camVizualizer/camSimpleVisualizer.vue";
 const storeCamUrlMenage = useCamUrlMenageStore();
+const storeCreateCamFullData = useCreateCamFullDataStore();
 
 const disabledControl = computed(() => {
   if (step.value === 1 && selectedDeviceType.value === null) return true; // Desabilita o botão "Anterior" no primeiro passo
@@ -335,6 +338,7 @@ const protocolCkeckBox = ref([]);
 const selectedManufacturer = ref(null);
 const selectedModel = ref(null);
 const preferedStream = ref(false);
+
 
 //observando mudanças
 watch([selectedManufacturer, selectedModel], ([newManufacturer, newModel]) => {
@@ -382,7 +386,8 @@ const camData = ref({
   camStatus: null,
 });
 
-// URL completa
+
+// URL completa rtsp
 const fullUrl = computed(() => {
   return (
     protocolCkeckBox.value[0].toLowerCase() +
@@ -461,5 +466,32 @@ const controleCamActions = {
   startStream: () => {
     controleCam.value.startStream();
   },
+};
+
+// chamadas na store para salvar dados
+const saveCamData = () => {
+  const device = 
+  {
+  "channel": deviceFullInfo.value.channel,
+  "prefered_stream_quality": deviceFullInfo.value.preferedStream,
+  "device_user": deviceFullInfo.value.user,
+  "device_password_hash": deviceFullInfo.value.pass,
+  "device_ip_url": deviceFullInfo.value.ip,
+  "porta": deviceFullInfo.value.porta,
+  "protocolo_entrada": protocolCkeckBox.value[0].toLowerCase(),
+  "protocolo_saida": "http"
+}
+
+  const fullCamData = {
+    "user_id": "0101",
+    "device_id": "0101",
+    "cam_name": camData.value.camName,
+    "grupo": camData.value.grupo,
+    "full_cam_url_stream": fullUrl.value, // ver isso
+    "ful_cam_url_rtsp": fullUrl.value,
+    "cam_status": "online",
+    "device_config": device 
+  };
+  storeCreateCamFullData.createCamFullData(fullCamData);
 };
 </script>

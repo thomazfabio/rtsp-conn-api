@@ -44,6 +44,7 @@ const isStreaming = ref(true);
 const refreshStream = ref(null);
 const baseURL = "http://localhost:5000";
 
+
 const props = defineProps({
   camUrl: String,
   camName: String,
@@ -58,6 +59,8 @@ const streamingURL = computed(() => {
     props.camUrl
   )}&refresh=${refreshStream.value}`;
 });
+
+
 
 // url da camera
 const camUrl = ref(props.camUrl);
