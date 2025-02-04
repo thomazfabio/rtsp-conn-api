@@ -298,6 +298,7 @@
                 :cam-name="camData.camName"
                 :grupo="camData.grupo"
                 :cam-chennel="deviceFullInfo.channel"
+                @url-ready="urlReady"
                 ref="controleCam"
               />
             </v-col>
@@ -338,6 +339,7 @@ const protocolCkeckBox = ref([]);
 const selectedManufacturer = ref(null);
 const selectedModel = ref(null);
 const preferedStream = ref(false);
+const urlStreamReady = ref(null);
 
 
 //observando mudanças
@@ -468,6 +470,12 @@ const controleCamActions = {
   },
 };
 
+// pega url de streaming do componente filho
+function urlReady(url) {
+  urlStreamReady.value = url;
+  console.log(urlStreamReady.value);
+}
+
 // chamadas na store para salvar dados
 const saveCamData = () => {
   const device = 
@@ -487,7 +495,7 @@ const saveCamData = () => {
     "device_id": "0101",
     "cam_name": camData.value.camName,
     "grupo": camData.value.grupo,
-    "full_cam_url_stream": fullUrl.value, // ver isso
+    "full_cam_url_stream": urlStreamReady,
     "ful_cam_url_rtsp": fullUrl.value,
     "cam_status": "online",
     "device_config": device 

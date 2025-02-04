@@ -35,13 +35,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, defineEmits, onMounted } from "vue";
 import { defineProps } from "vue";
 import { defineExpose } from "vue";
 import { useVisualizerCamV2Store } from "../../stores/controlStream/visualizerCamV2";
 const visualizerCamV2Store = useVisualizerCamV2Store();
 const isStreaming = ref(true);
 const refreshStream = ref(null);
+const emit = defineEmits(["urlReady"]);
 const baseURL = "http://localhost:5000";
 
 
@@ -60,6 +61,10 @@ const streamingURL = computed(() => {
   )}&refresh=${refreshStream.value}`;
 });
 
+// Emitir a URL de streaming
+onMounted(() => {
+  emit("urlReady", streamingURL.value);
+});
 
 
 // url da camera

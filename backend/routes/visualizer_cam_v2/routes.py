@@ -133,7 +133,7 @@ def stream_video():
         return jsonify({"message": "Stream não encontrado. Use '/start_stream' primeiro."}), 404
 
     def generate():
-        fps_limit = 15  # Limitar a 10 frames por segundo (ajustável)
+        fps_limit = 20  # Limitar a 10 frames por segundo (ajustável)
         frame_interval = 1 / fps_limit
         last_frame_time = time.time()
 
