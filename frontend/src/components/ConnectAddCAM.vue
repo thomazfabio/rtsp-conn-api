@@ -366,7 +366,7 @@ const saveCamData = () => {
     "device_id": "0101",
     "cam_name": camData.value.camName,
     "grupo": camData.value.grupo,
-    "full_cam_url_stream": urlStreamReady,
+    "full_cam_url_stream": urlStreamReady.value,
     "ful_cam_url_rtsp": fullUrl.value,
     "cam_status": "online",
     "device_config": device
