@@ -61,7 +61,6 @@
                 <v-col cols="auto">
                   <v-checkbox v-model="preferedStream" label="Stream extra " color="info">
                   </v-checkbox>
-                  {{ deviceFullInfo.preferedStream }}
                 </v-col>
               </v-row>
               <v-row>
@@ -69,8 +68,6 @@
                   <v-text-field v-model="deviceFullInfo.user" label="Usuario" variant="outlined"
                     density="compact"></v-text-field>
                 </v-col>
-              </v-row>
-              <v-row>
                 <v-col cols="12" xl="4" lg="4" md="4" sm="8">
                   <v-text-field v-model="deviceFullInfo.pass" label="Senha" variant="outlined"
                     density="compact"></v-text-field>
@@ -98,16 +95,17 @@
     </template>
 
     <template v-slot:item.3>
-      <v-card title="Verificação da URL" flat>
+      <v-alert v-if="alerts.alert_teste_url.status" :type="alerts.alert_teste_url.type" variant="outlined" closable
+        dismissible>
+        {{ alerts.alert_teste_url.msg }}
+      </v-alert>
+      <v-card :loading="loading.await_status_url" :disabled="loading.await_status_url" title="Verificação da URL" flat>
         <v-divider />
         <v-card-text>Essa é sua URL:</v-card-text>
         <v-container>
           <v-row class="mb-4">
             <v-col>
-              <span class="text-primary font-weight-bold" v-if="
-                selectedDeviceType === 'DVR' &&
-                deviceFullInfo.fabricante === 'Intelbras'
-              ">{{ fullUrl }}</span>
+              <span class="text-primary font-weight-bold">{{ fullUrl }}</span>
             </v-col>
           </v-row>
           <v-divider />
@@ -128,7 +126,12 @@
     </template>
 
     <template v-slot:item.4>
-      <v-card title="Finalize e salve as configurações" flat>
+      <v-alert v-if="alerts.alert_save_cam.status" :type="alerts.alert_save_cam.type" variant="outlined" closable
+        dismissible>
+        {{ alerts.alert_save_cam.msg }}
+      </v-alert>
+      <v-card :loading="loading.await_status_save_cam" :disabled="loading.await_status_save_cam"
+        title="Finalize e salve as configurações" flat>
         <v-container>
           <v-row>
             <v-col cols="auto">
@@ -201,6 +204,7 @@ const disabledControl = computed(() => {
   if (step.value === 1 && selectedDeviceType.value === null) return true; // Desabilita o botão "Anterior" no primeiro passo
   if (step.value === 4) return "next"; // Desabilita o botão "Próximo" no último passo
   if (step.value === 2 && protocolCkeckBox.value != "RTSP") return "next";
+  if (step.value === 3 && statusUrl.value.status !== "online") return "next";
 });
 
 const step = ref(1); // Estado atual do passo
@@ -211,6 +215,8 @@ const selectedManufacturer = ref(null);
 const selectedModel = ref(null);
 const preferedStream = ref(false);
 const urlStreamReady = ref(null);
+const loading = ref({ await_status_url: false, await_status_save_cam: false });
+const alerts = ref({ alert_teste_url: { type: "", status: false, msg: "" }, alert_save_cam: { type: "", status: false, msg: "" } });
 
 
 //observando mudanças
@@ -328,7 +334,30 @@ onMounted(() => {
   console.log("Status inicial:", statusUrl.value.status);
 });
 
-const teste_url = () => storeCamUrlMenage.testeUrlRtsp(fullUrl.value);
+const teste_url = async () => {
+  loading.value.await_status_url = true;
+  alerts.value.alert_teste_url.status = false;
+  alerts.value.alert_teste_url.msg = "";
+  alerts.value.alert_teste_url.type = "";
+  await storeCamUrlMenage.testeUrlRtsp(fullUrl.value).then((res, err) => {
+    loading.value.await_status_url = false;
+    if (res.data.status === "online") {
+      alerts.value.alert_teste_url.status = true;
+      alerts.value.alert_teste_url.type = "success";
+      alerts.value.alert_teste_url.msg = "URL valida. Testada com sucesso!";
+    }
+    if (res.data.status === "error") {
+      alerts.value.alert_teste_url.status = true;
+      alerts.value.alert_teste_url.type = "error";
+      alerts.value.alert_teste_url.msg = "Falha ao testar URL. Verifique os dados do dispositivo e tente novamente";
+    }
+    if (err) {
+      alerts.value.alert_teste_url.status = true;
+      alerts.value.alert_teste_url.type = "error";
+      alerts.value.alert_teste_url.msg = "Falha ao testar URL. Verifique os dados do dispositivo e tente novamente";
+    }
+  });
+}
 
 // lidando com controles do passo 4
 const controleCam = ref(null);
@@ -348,7 +377,7 @@ function urlReady(url) {
 }
 
 // chamadas na store para salvar dados
-const saveCamData = () => {
+const saveCamData = async () => {
   const device =
   {
     "channel": deviceFullInfo.value.channel,
@@ -371,6 +400,24 @@ const saveCamData = () => {
     "cam_status": "online",
     "device_config": device
   };
-  storeCreateCamFullData.createCamFullData(fullCamData);
+
+  loading.value.await_status_save_cam = true;
+  alerts.value.alert_save_cam.status = false;
+  try {
+    const response = await storeCreateCamFullData.createCamFullData(fullCamData);
+    loading.value.await_status_save_cam = false;
+    console.log(response);
+    console.log("Dados da câmera salvo com sucesso componente ConnectAddCAM.vue");
+    alerts.value.alert_save_cam.status = true;
+    alerts.value.alert_save_cam.type = "success";
+    alerts.value.alert_save_cam.msg = "Dados da câmera salvo com sucesso!";
+  } catch (err) {
+    loading.value.await_status_save_cam = false;;
+    console.error("Erro capturado:", err);
+    console.log("Erro ao salvar dados da câmera componente ConnectAddCAM.vue");
+    alerts.value.alert_save_cam.status = true;
+    alerts.value.alert_save_cam.type = "error";
+    alerts.value.alert_save_cam.msg = "Erro ao salvar dados da câmera!";
+  }
 };
 </script>
