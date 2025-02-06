@@ -362,8 +362,8 @@ const saveCamData = () => {
   }
 
   const fullCamData = {
-    "user_id": "0101",
-    "device_id": "0101",
+    "user_id": "1",
+    "device_id": "1",
     "cam_name": camData.value.camName,
     "grupo": camData.value.grupo,
     "full_cam_url_stream": urlStreamReady.value,
