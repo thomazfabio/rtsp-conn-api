@@ -1,9 +1,14 @@
-<script setup>
-import camSimpleVisualizer from '@/components/camVizualizer/camSimpleVisualizer.vue';
-</script>
 <template>
-  <div>
-    <h1>Cam Visualizer</h1>
-    <camSimpleVisualizer />
-  </div>
+  <v-container>
+    <v-row>
+      <v-col>
+        <searchCamV1 />
+      </v-col>
+    </v-row>
+
+  </v-container>
 </template>
+
+<script setup>
+import searchCamV1 from '../components/searchCam/searchCamV1.vue';
+</script>

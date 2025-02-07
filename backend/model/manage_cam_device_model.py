@@ -18,6 +18,21 @@ class ManageCamDevice(db.Model):
     # Timestamps
     created_at = db.Column(db.DateTime, default=func.now())  # Define a data de criação automaticamente
     updated_at = db.Column(db.DateTime, default=func.now(), onupdate=func.now())  # Atualiza sempre que o registro mudar
+    
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "device_id": self.device_id,
+            "cam_name": self.cam_name,
+            "grupo": self.grupo,
+            "full_cam_url_stream": self.full_cam_url_stream,
+            "full_cam_url_rtsp": self.full_cam_url_rtsp,
+            "cam_status": self.cam_status,
+            "device_config": self.device_config,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }
 
     def __repr__(self):
         return f"<ManageCamDevice {self.user_id} - {self.device_id}>"

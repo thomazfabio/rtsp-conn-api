@@ -21,7 +21,8 @@ def delete():
 
 @manage_cam_device_bp.route('/list', methods=['GET'])
 def list():
-    return jsonify([])
+    data = request.get_json()
+    return manage_cam_device_controller.getByUserId(data.get("user_id"))
 
 @manage_cam_device_bp.route('/get', methods=['GET'])
 def get():
