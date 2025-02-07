@@ -19,10 +19,10 @@ def delete():
     data = request.get_json()
     return jsonify(data)
 
-@manage_cam_device_bp.route('/list', methods=['GET'])
+@manage_cam_device_bp.route('/list_by_user_id', methods=['GET'])
 def list():
-    data = request.get_json()
-    return manage_cam_device_controller.getByUserId(data.get("user_id"))
+    user_id = request.args.get('user_id')
+    return manage_cam_device_controller.getByUserId(user_id)
 
 @manage_cam_device_bp.route('/get', methods=['GET'])
 def get():

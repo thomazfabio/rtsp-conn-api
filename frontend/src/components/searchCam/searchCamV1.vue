@@ -14,9 +14,6 @@
     <v-container v-if="searchType" class="pl-0 pr-0">
         <v-row v-if="searchType == 'all'">
             <v-col>
-                <v-btn color="success" @click="searchCameras('all')" prepend-icon="mdi-magnify" class="mb-3">
-                    listar todas as câmeras
-                </v-btn>
                 <v-data-table-server :items-length="0" item-key="name" loading-text="Loading... Please wait"
                     loading></v-data-table-server>
             </v-col>
@@ -34,24 +31,35 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useSearchCamStore } from '../../stores/deviceManage/searchCam';
 const searchType = ref(null);
 const loading = ref(false);
 const cardsActive = ref({ cardSearchAll: false, cardSearchByGroup: false });
+const storeSearchCam = useSearchCamStore();
 
 function setSearchType(type) {
     searchType.value = type;
     console.log(searchType.value);
 }
 
-function searchCameras(type) {
-    if (type == 'all') {
-        cardsActive.value.cardSearchAll = true;
-        loading.value = true;
-        console.log('searching all cameras');
-    } else if (type == 'byGroup') {
-        searchCamerasByGroup();
+watch(searchType, (newValue, oldValue) => {
+    if (newValue == 'all') {
+        searchCamByUserId();
+    } else if (newValue == 'byGroup') {
+
+    }
+});
+
+async function searchCamByUserId() {
+    try {
+        const id = {"user_id": 1};
+        const response = await storeSearchCam.searchCamByUserId(id);
+        console.log(response);
+    } catch (error) {
+        console.log(error);
+    } finally {
+        loading.value = false;
     }
 }
-
 </script>
