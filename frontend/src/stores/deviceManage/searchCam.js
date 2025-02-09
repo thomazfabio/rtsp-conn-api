@@ -22,7 +22,7 @@ export const useSearchCamStore = defineStore("search-cam", () => {
             const response = await api.delete(endpoint, { params: { id: cam_id } });
             return response;
         } catch (error) {
-            console.error("Erro na requisição:", error);
+        
             throw error;
         }
     }

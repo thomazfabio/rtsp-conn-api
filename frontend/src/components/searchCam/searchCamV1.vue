@@ -4,8 +4,14 @@
         <v-btn color="primary" @click="setSearchType('all')" variant="text">
             buscar todas
         </v-btn>
+        <v-btn color="primary" @click="searchCamByUserId()" variant="text">
+            Atualizar
+        </v-btn>
     </v-toolbar>
-
+    <v-alert v-if="alerts.alertDelete.status" :type="alerts.alertDelete.type" dismissible closable class="mt-2"
+        variant="outlined">
+        {{ alerts.alertDelete.message }}
+    </v-alert>
     <v-container v-if="searchType" class="pl-0 pr-0">
         <v-row v-if="searchType == 'all'">
             <v-col>
@@ -18,10 +24,10 @@
                         <v-dialog v-model="dialogEdit" max-width="290" persistent opacity="0.1">
                             <template v-slot:activator="{ props: activatorProps }">
 
-                                <v-btn v-bind="activatorProps" color="primary" @click="editCam(item.id)" small
-                                    class="mr-2">
-                                    Editar
-                                </v-btn>
+                                <v-icon v-bind="activatorProps" color="primary" @click="editCam(item.id)" small
+                                    class="mr-4" v-tooltip="'clique aqui para editar'">
+                                    mdi-pencil-outline
+                                </v-icon>
                             </template>
                             <v-card>
                                 <v-card-title>Editar Câmera</v-card-title>
@@ -35,9 +41,10 @@
                         </v-dialog>
                         <v-dialog v-model="dialogDelete" max-width="450" persistent opacity="0.1">
                             <template v-slot:activator="{ props: activatorProps }">
-                                <v-btn @click="openDeleteDialog(item)" v-bind="activatorProps" color="red" small>
-                                    Deletar
-                                </v-btn>
+                                <v-icon @click="openDeleteDialog(item)" v-bind="activatorProps" color="red" small
+                                    v-tooltip="'clique aqui para deletar'">
+                                    mdi-trash-can-outline
+                                </v-icon>
                             </template>
                             <v-card>
                                 <v-card-title>Tem certeza que deseja deletar a câmera?</v-card-title>
@@ -78,7 +85,7 @@ import { ref, watch } from 'vue';
 import { useSearchCamStore } from '../../stores/deviceManage/searchCam';
 const searchType = ref(null);
 const loading = ref(false);
-const cardsActive = ref({ cardSearchAll: false, cardSearchByGroup: false });
+const alerts = ref({ alertDelete: { status: false, message: '', type: '' }, alertEdit: { status: false, message: '', type: '' } });
 const dialogEdit = ref(false);
 const dialogDelete = ref(false);
 const selectedItem = ref(null);
@@ -132,17 +139,17 @@ async function searchCamByUserId() {
 // dialogos de edição e exclusão
 
 const openEditDialog = (item) => {
-  selectedItem.value = item;
-  dialogEdit.value = true;
+    selectedItem.value = item;
+    dialogEdit.value = true;
 };
 
 const openDeleteDialog = (item) => {
-  selectedItem.value = item;
-  dialogDelete.value = true;
+    selectedItem.value = item;
+    dialogDelete.value = true;
 };
 
 async function editCam(item) {
-   
+
 }
 
 const isDialogDelete = () => {
@@ -150,8 +157,28 @@ const isDialogDelete = () => {
 }
 
 async function deleteCam(id) {
-    console.log(id);
+    alerts.value.alertDelete.status = false;
     await storeSearchCam.deleteCamById(id).then((res) => {
+        console.log(res.status);
+        if (res.status == 200) {
+            alerts.value.alertDelete.type = 'warning';
+            alerts.value.alertDelete.status = true;
+            alerts.value.alertDelete.message = 'Câmera deletada com sucesso!';
+            dialogDelete.value = false;
+            searchCamByUserId();
+        }
+        if (res.status == 500) {
+            alerts.value.alertDelete.type = 'error';
+            alerts.value.alertDelete.status = true;
+            alerts.value.alertDelete.message = 'Erro ao deletar câmera!';
+            dialogDelete.value = false;
+        }
+    }).catch((err) => {
+        console.log(err);
+        alerts.value.alertDelete.type = 'error';
+        alerts.value.alertDelete.status = true;
+        alerts.value.alertDelete.message = 'Erro ao deletar câmera!';
+        dialogDelete.value = false;
     });
 }
 </script>
