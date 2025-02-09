@@ -14,10 +14,10 @@ def update():
     data = request.get_json()
     return jsonify(data)
 
-@manage_cam_device_bp.route('/delete', methods=['POST'])
+@manage_cam_device_bp.route('/delete', methods=['DELETE'])
 def delete():
-    data = request.get_json()
-    return jsonify(data)
+    id = request.args.get('id')
+    return manage_cam_device_controller.delete(id)
 
 @manage_cam_device_bp.route('/list_by_user_id', methods=['GET'])
 def list():

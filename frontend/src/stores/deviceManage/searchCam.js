@@ -5,26 +5,28 @@ const api = api_url_rtsp;
 export const useSearchCamStore = defineStore("search-cam", () => {
     async function searchCamByUserId(user_id) {
         const id = user_id.user_id;
+        const endpoint = "manage_cam_device/list_by_user_id";
 
-        const endpoint = "manage_cam_device/list_by_user_id"
-    
-        await api.get(endpoint, { params: { user_id: id} }).then((response) => {
-            console.log(response.status);
-            console.log(response.data);
-            console.log("response");
-            return response;
-
-        }).catch((error) => {
-            console.log(error);
-            console.log("error");
-            throw error; // Garante que o erro seja propagado para ser capturado no `catch`
-        });
-        // const response = await api.post(endpoint, camData);
-
-        //  console.log(response.status)
-        //  return response;
+        try {
+            const response = await api.get(endpoint, { params: { user_id: id } });
+            return response;  // Agora realmente retorna os dados
+        } catch (error) {
+            console.error("Erro na requisição:", error);
+            throw error; // Propaga o erro para ser tratado externamente
+        }
     }
 
-    return { searchCamByUserId };
+    async function deleteCamById(cam_id) {
+        const endpoint = "manage_cam_device/delete";
+        try {
+            const response = await api.delete(endpoint, { params: { id: cam_id } });
+            return response;
+        } catch (error) {
+            console.error("Erro na requisição:", error);
+            throw error;
+        }
+    }
+
+    return { searchCamByUserId, deleteCamById };
 }
 );

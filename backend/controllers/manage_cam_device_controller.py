@@ -32,7 +32,6 @@ def getAll():
 
 
 def getByUserId(user_id):
-    print(user_id)
     try:
         cam_devices = manage_cam_device_model.ManageCamDevice.query.filter_by(
             user_id=user_id
@@ -40,3 +39,12 @@ def getByUserId(user_id):
         return jsonify([cam_device.serialize() for cam_device in cam_devices]), 200
     except Exception as e:
         return jsonify({"message": f"Error getting cam devices: {e}"}), 500
+    
+def delete(id):
+    try:
+        cam_device = manage_cam_device_model.ManageCamDevice.query.get(id)
+        db.session.delete(cam_device)
+        db.session.commit()
+        return jsonify({"message": "Cam device deleted successfully!"}), 200
+    except Exception as e:
+        return jsonify({"message": f"Error deleting cam device: {e}"}), 500
