@@ -12,13 +12,37 @@
         variant="outlined">
         {{ alerts.alertDelete.message }}
     </v-alert>
+    <v-alert v-if="alerts.alertEdit.status" :type="alerts.alertEdit.type" dismissible closable class="mt-2"
+        variant="outlined">
+        {{ alerts.alertEdit.message }}
+    </v-alert>
+    <v-alert v-if="alerts.alertCopyUrl.status" :type="alerts.alertCopyUrl.type" dismissible closable class="mt-2"
+        variant="outlined">
+        {{ alerts.alertCopyUrl.message }}
+    </v-alert>
     <v-container v-if="searchType" class="pl-0 pr-0">
         <v-row v-if="searchType == 'all'">
             <v-col>
                 <v-data-table-server :headers="headers" color="blue" :items-length="0" item-key="name"
                     loading-text="Loading... Please wait" :loading="loading" :items="serverItems">
                     <template v-slot:item.full_cam_url_stream="{ item }">
-                        {{ truncateUrl(item.full_cam_url_stream) }}
+                        <span class="url-link" @click="openVerUrlDialog(item)">
+                            {{ truncateUrl(item.full_cam_url_stream) }}
+                        </span>
+                        <!-- dialog para copiar a URL -->
+                        <v-dialog v-model="dialogVerUrl" opacity="0.1">
+                            <v-card>
+                                <v-card-title>URL Completa</v-card-title>
+                                <v-card-text>
+                                    <v-text-field v-model="selectedItem.full_cam_url_stream" readonly
+                                        append-icon="mdi-content-copy" @click:append="copyToClipboard"></v-text-field>
+                                </v-card-text>
+                                <v-card-actions>
+                                    <v-btn color="red" @click="dialogVerUrl = false">Fechar</v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </v-dialog>
+
                     </template>
                     <template v-slot:item.actions="{ item }">
                         <v-dialog v-model="dialogEdit" max-width="290" persistent opacity="0.1">
@@ -85,9 +109,14 @@ import { ref, watch } from 'vue';
 import { useSearchCamStore } from '../../stores/deviceManage/searchCam';
 const searchType = ref(null);
 const loading = ref(false);
-const alerts = ref({ alertDelete: { status: false, message: '', type: '' }, alertEdit: { status: false, message: '', type: '' } });
+const alerts = ref({
+    alertDelete: { status: false, message: '', type: '' },
+    alertEdit: { status: false, message: '', type: '' },
+    alertCopyUrl: { status: false, message: '', type: '' }
+});
 const dialogEdit = ref(false);
 const dialogDelete = ref(false);
+const dialogVerUrl = ref(false);
 const selectedItem = ref(null);
 
 const storeSearchCam = useSearchCamStore();
@@ -120,6 +149,8 @@ const truncateUrl = (url) => {
     return url;
 };
 
+
+
 async function searchCamByUserId() {
     loading.value = true;
     const dataShowInTable = ["id", "cam_name", "grupo", "cam_status", "full_cam_url_stream"];
@@ -136,6 +167,15 @@ async function searchCamByUserId() {
     });
 }
 
+// copiar a url para area de transferencia
+function copyToClipboard() {
+    navigator.clipboard.writeText(selectedItem.value.full_cam_url_stream);
+    alerts.value.alertCopyUrl.type = 'success';
+    alerts.value.alertCopyUrl.status = true;
+    alerts.value.alertCopyUrl.message = 'URL copiada para a área de transferência!';
+    dialogVerUrl.value = false;
+}
+
 // dialogos de edição e exclusão
 
 const openEditDialog = (item) => {
@@ -148,13 +188,17 @@ const openDeleteDialog = (item) => {
     dialogDelete.value = true;
 };
 
+const openVerUrlDialog = (item) => {
+    alerts.value.alertCopyUrl.status = false;
+    selectedItem.value = item;
+    dialogVerUrl.value = true;
+    console.log(item)
+};
+
 async function editCam(item) {
 
 }
 
-const isDialogDelete = () => {
-    dialogDelete.value = true;
-}
 
 async function deleteCam(id) {
     alerts.value.alertDelete.status = false;
@@ -182,3 +226,16 @@ async function deleteCam(id) {
     });
 }
 </script>
+
+<style scoped>
+.url-link {
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+.url-link:hover {
+    color: rgb(4, 72, 99);
+    text-decoration: none;
+}
+</style>
