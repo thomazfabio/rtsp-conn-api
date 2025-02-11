@@ -26,7 +26,7 @@
                 <v-data-table-server :headers="headers" color="blue" :items-length="0" item-key="name"
                     loading-text="Loading... Please wait" :loading="loading" :items="serverItems">
                     <template v-slot:item.full_cam_url_stream="{ item }">
-                        <span class="url-link" @click="openVerUrlDialog(item)">
+                        <span  v-tooltip="'clique aqui para copiar a URL'"  class="url-link" @click="openVerUrlDialog(item)">
                             {{ truncateUrl(item.full_cam_url_stream) }}
                         </span>
                         <!-- dialog para copiar a URL -->
@@ -144,7 +144,7 @@ watch(searchType, (newValue, oldValue) => {
 
 const truncateUrl = (url) => {
     if (url.length > 50) {
-        return url.substring(0, 50) + '...';
+        return url.substring(0, 30) + '...';
     }
     return url;
 };
@@ -229,13 +229,14 @@ async function deleteCam(id) {
 
 <style scoped>
 .url-link {
+    color: #2196F3;
     cursor: pointer;
     text-decoration: none;
     transition: color 0.2s ease-in-out;
 }
 
 .url-link:hover {
-    color: rgb(4, 72, 99);
+    color: #4CAF50;
     text-decoration: none;
 }
 </style>
