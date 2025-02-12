@@ -27,6 +27,16 @@ export const useSearchCamStore = defineStore("search-cam", () => {
         }
     }
 
-    return { searchCamByUserId, deleteCamById };
+    async function updateCamById(data) {
+        const endpoint = "manage_cam_device/update";
+        try {
+            const response = await api.put(endpoint, data );
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    return { searchCamByUserId, deleteCamById, updateCamById };
 }
 );

@@ -58,32 +58,33 @@
                             <v-card>
                                 <v-card-title>Editar Câmera</v-card-title>
                                 <v-container>
-                                <v-row>
-                                    <v-col>
-                                        <span class="text-justify" style="text-align: justify; display: block;">
-                                            <v-icon color="orange">mdi-alert-outline</v-icon>
-                                            Você pode editar o nome da câmera e o grupo, se precisar de mudanças
-                                            avançadas,
-                                            exclua e adicione
-                                            novamente a câmera.
-                                        </span>
-                                    </v-col>
-                                </v-row>
-                                <v-row>
-                                    <v-col>
-                                        <v-text-field v-model="selectedItem.cam_name" label="Nome da Câmera"
-                                            variant="outlined"></v-text-field>
-                                    </v-col>    
-                                </v-row>
-                                <v-row>
-                                    <v-col>
-                                        <v-text-field v-model="selectedItem.grupo" label="Grupo" variant="outlined"></v-text-field>
-                                    </v-col>
-                                </v-row>
-                            </v-container>
+                                    <v-row>
+                                        <v-col>
+                                            <span class="text-justify" style="text-align: justify; display: block;">
+                                                <v-icon color="orange">mdi-alert-outline</v-icon>
+                                                Você pode editar o nome da câmera e o grupo, se precisar de mudanças
+                                                avançadas,
+                                                exclua e adicione
+                                                novamente a câmera.
+                                            </span>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col>
+                                            <v-text-field :model-value="selectedItem.cam_name" @update:model-value="(val) => inEdit.cam_name = val" label="Nome da Câmera"
+                                                variant="outlined"></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col>
+                                            <v-text-field :model-value="selectedItem.grupo" @update:model-value="(val) => inEdit.grupo = val" label="Grupo"
+                                                variant="outlined"></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
                                 <v-card-actions>
                                     <v-btn color="red" @click="dialogEdit = false">cancelar</v-btn>
-                                    <v-btn color="green" @click="editCam(item)">salvar</v-btn>
+                                    <v-btn color="green" @click="editCam(selectedItem)">salvar</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </v-dialog>
@@ -97,11 +98,6 @@
                             <v-card>
                                 <v-card-title>Tem certeza que deseja deletar a câmera?</v-card-title>
                                 <v-card-text>
-                                    <v-row>
-                                        <v-col>
-                                            ID: {{ selectedItem.id }}
-                                        </v-col>
-                                    </v-row>
                                     <v-row>
                                         <v-col>
                                             Câmera: {{ selectedItem.cam_name }}
@@ -154,6 +150,13 @@ const headers = [
     { title: 'Ações', key: 'actions', sortable: false, align: 'end' },
 ];
 
+// Dados temporarios para edição
+const inEdit = ref({
+    cam_name: '',
+    grupo: ''
+});
+
+
 function setSearchType(type) {
     searchType.value = type;
 }
@@ -205,6 +208,7 @@ function copyToClipboard() {
 const openEditDialog = (item) => {
     selectedItem.value = item;
     dialogEdit.value = true;
+    inEdit.value = { ...item }; // Copia os valores existentes
 };
 
 const openDeleteDialog = (item) => {
@@ -220,7 +224,33 @@ const openVerUrlDialog = (item) => {
 };
 
 async function editCam(item) {
-
+    const { id } = item;
+    const { cam_name, grupo } = inEdit.value;
+    const data = { id, cam_name, grupo };
+    console.log(data);
+    alerts.value.alertEdit.status = false;
+    await storeSearchCam.updateCamById(data).then((res) => {
+        console.log(res.status);
+        if (res.status == 200) {
+            alerts.value.alertEdit.type = 'info';
+            alerts.value.alertEdit.status = true;
+            alerts.value.alertEdit.message = 'Câmera editada com sucesso!';
+            dialogEdit.value = false;
+            searchCamByUserId();
+        }
+        if (res.status == 500) {
+            alerts.value.alertEdit.type = 'error';
+            alerts.value.alertEdit.status = true;
+            alerts.value.alertEdit.message = 'Erro ao editar câmera!';
+            dialogEdit.value = false;
+        }
+    }).catch((err) => {
+        console.log(err);
+        alerts.value.alertEdit.type = 'error';
+        alerts.value.alertEdit.status = true;
+        alerts.value.alertEdit.message = 'Erro ao editar câmera!';
+        dialogEdit.value = false;
+    });
 }
 
 
