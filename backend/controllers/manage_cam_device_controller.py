@@ -39,7 +39,8 @@ def getByUserId(user_id):
         return jsonify([cam_device.serialize() for cam_device in cam_devices]), 200
     except Exception as e:
         return jsonify({"message": f"Error getting cam devices: {e}"}), 500
-    
+
+
 def delete(id):
     try:
         cam_device = manage_cam_device_model.ManageCamDevice.query.get(id)
@@ -48,3 +49,27 @@ def delete(id):
         return jsonify({"message": "Cam device deleted successfully!"}), 200
     except Exception as e:
         return jsonify({"message": f"Error deleting cam device: {e}"}), 500
+
+
+def update(data):
+    try:
+        cam_device = manage_cam_device_model.ManageCamDevice.query.get(data.get("id"))
+
+        if not cam_device:
+            return jsonify({"message": "Cam device not found!"}), 404
+
+        # Verifica se algum campo válido foi enviado
+        if not any(key in data for key in ["cam_name", "grupo"]):
+            return jsonify({"message": "No valid data provided for update!"}), 400
+
+        # Atualiza apenas os campos fornecidos na requisição
+        if "cam_name" in data:
+            cam_device.cam_name = data["cam_name"]
+        if "grupo" in data:
+            cam_device.grupo = data["grupo"]
+
+        db.session.commit()
+        return jsonify({"message": "Cam device updated successfully!"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error updating cam device: {str(e)}"}), 500

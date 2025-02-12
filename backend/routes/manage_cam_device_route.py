@@ -9,10 +9,10 @@ def create():
     return manage_cam_device_controller.create(data)
     
 
-@manage_cam_device_bp.route('/update', methods=['POST'])
+@manage_cam_device_bp.route('/update', methods=['PUT'])
 def update():
     data = request.get_json()
-    return jsonify(data)
+    return manage_cam_device_controller.update(data)
 
 @manage_cam_device_bp.route('/delete', methods=['DELETE'])
 def delete():

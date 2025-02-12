@@ -26,16 +26,18 @@
                 <v-data-table-server :headers="headers" color="blue" :items-length="0" item-key="name"
                     loading-text="Loading... Please wait" :loading="loading" :items="serverItems">
                     <template v-slot:item.full_cam_url_stream="{ item }">
-                        <span  v-tooltip="'clique aqui para copiar a URL'"  class="url-link" @click="openVerUrlDialog(item)">
+                        <span v-tooltip="'clique aqui para copiar a URL'" class="url-link"
+                            @click="openVerUrlDialog(item)">
                             {{ truncateUrl(item.full_cam_url_stream) }}
                         </span>
                         <!-- dialog para copiar a URL -->
-                        <v-dialog v-model="dialogVerUrl" opacity="0.1">
+                        <v-dialog v-model="dialogVerUrl" opacity="0.1" max-width="490">
                             <v-card>
                                 <v-card-title>URL Completa</v-card-title>
                                 <v-card-text>
-                                    <v-text-field v-model="selectedItem.full_cam_url_stream" readonly
-                                        append-icon="mdi-content-copy" @click:append="copyToClipboard"></v-text-field>
+                                    <v-text-field v-model="selectedItem.full_cam_url_stream" readonly variant="outlined"
+                                        v-tooltip="'copiar'" append-icon="mdi-content-copy"
+                                        @click:append="copyToClipboard"></v-text-field>
                                 </v-card-text>
                                 <v-card-actions>
                                     <v-btn color="red" @click="dialogVerUrl = false">Fechar</v-btn>
@@ -45,21 +47,43 @@
 
                     </template>
                     <template v-slot:item.actions="{ item }">
-                        <v-dialog v-model="dialogEdit" max-width="290" persistent opacity="0.1">
+                        <v-dialog v-model="dialogEdit" max-width="490" persistent opacity="0.1">
                             <template v-slot:activator="{ props: activatorProps }">
 
-                                <v-icon v-bind="activatorProps" color="primary" @click="editCam(item.id)" small
+                                <v-icon v-bind="activatorProps" color="primary" @click="openEditDialog(item)" small
                                     class="mr-4" v-tooltip="'clique aqui para editar'">
                                     mdi-pencil-outline
                                 </v-icon>
                             </template>
                             <v-card>
                                 <v-card-title>Editar Câmera</v-card-title>
-                                <v-card-text>
-                                    {{ item.id }}
-                                </v-card-text>
+                                <v-container>
+                                <v-row>
+                                    <v-col>
+                                        <span class="text-justify" style="text-align: justify; display: block;">
+                                            <v-icon color="orange">mdi-alert-outline</v-icon>
+                                            Você pode editar o nome da câmera e o grupo, se precisar de mudanças
+                                            avançadas,
+                                            exclua e adicione
+                                            novamente a câmera.
+                                        </span>
+                                    </v-col>
+                                </v-row>
+                                <v-row>
+                                    <v-col>
+                                        <v-text-field v-model="selectedItem.cam_name" label="Nome da Câmera"
+                                            variant="outlined"></v-text-field>
+                                    </v-col>    
+                                </v-row>
+                                <v-row>
+                                    <v-col>
+                                        <v-text-field v-model="selectedItem.grupo" label="Grupo" variant="outlined"></v-text-field>
+                                    </v-col>
+                                </v-row>
+                            </v-container>
                                 <v-card-actions>
-                                    <v-btn color="red" @click="dialogEdit = false">Fechar</v-btn>
+                                    <v-btn color="red" @click="dialogEdit = false">cancelar</v-btn>
+                                    <v-btn color="green" @click="editCam(item)">salvar</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </v-dialog>
