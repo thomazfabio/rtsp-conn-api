@@ -1,5 +1,5 @@
 <template>
-  <v-stepper hide-actions ref="stepper" :items="['Passo 1', 'Passo 2', 'Passo 3', 'Passo 4']" v-model="step">
+  <v-stepper  hide-actions ref="stepper" :items="['Passo 1', 'Passo 2', 'Passo 3', 'Passo 4']" v-model="step">
     <template v-slot:item.1>
       <v-card title="Selecione o tipo de dispositivo:" flat>
         <v-row>

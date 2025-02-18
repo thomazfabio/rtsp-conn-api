@@ -11,7 +11,7 @@
           title="Adicionar câmera"
           to="connectCam"
         />
-        <v-list-item prepend-icon="mdi-cog-transfer" title="Configurações" to="" />
+        <v-list-item prepend-icon="mdi-cog-transfer" title="Configurações" to="/settings" />
       </v-list>
 
       <template v-slot:append>
