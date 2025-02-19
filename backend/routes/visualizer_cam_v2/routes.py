@@ -60,8 +60,9 @@ class VideoStream:
         return True
 
     def _read_frames(self):
-        target_fps = 5  # FPS desejado
+        target_fps = 15  # FPS desejado
         frame_time = 1.0 / target_fps  # Tempo ideal entre frames
+
         while self.running:
             start_time = time.time()
 
@@ -84,8 +85,13 @@ class VideoStream:
                         break
 
             if ret:
-                
-                ret, buffer = cv2.imencode(".jpg", frame)
+                frame = cv2.resize(frame, (640, 480))
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                ret, buffer = cv2.imencode(
+                    ".jpg",
+                    frame,
+                    [cv2.IMWRITE_JPEG_QUALITY, 70],
+                )
                 if ret:
                     self.buffer.append(buffer.tobytes())
 
@@ -166,21 +172,21 @@ def stream_video():
         )
 
     def generate():
-        fps_limit = 10  # Limitar a 10 frames por segundo (ajustável)
-        frame_interval = 1 / fps_limit
-        last_frame_time = time.time()
+            fps_limit = 15  # Limitar a 10 frames por segundo (ajustável)
+            frame_interval = 1 / fps_limit
+            last_frame_time = time.time()
 
-        while True:
-            frame = stream.get_frame()
-            if frame:
-                current_time = time.time()
-                if current_time - last_frame_time >= frame_interval:
-                    last_frame_time = current_time
-                    yield (
-                        b"--frame\r\n"
-                        b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n"
-                    )
-            else:
-                time.sleep(0.1)  # Aguarda até que um frame esteja disponível
+            while True:
+                frame = stream.get_frame()
+                if frame:
+                    current_time = time.time()
+                    if current_time - last_frame_time >= frame_interval:
+                        last_frame_time = current_time               
+                        yield (
+                            b"--frame\r\n"
+                            b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n"
+                        )
+                else:
+                    time.sleep(0.1)  # Aguarda até que um frame esteja disponível
 
     return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")

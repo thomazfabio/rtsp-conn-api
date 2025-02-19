@@ -6,7 +6,7 @@ from collections import deque
 from . import visualizer_cam_v2
 
 # Gerenciamento de streams ativos
-
+fps_data = {}  # Armazena os FPS de cada URL de stream
 
 class StreamManager:
     def __init__(self):
@@ -62,6 +62,7 @@ class VideoStream:
     def _read_frames(self):
         target_fps = 5  # FPS desejado
         frame_time = 1.0 / target_fps  # Tempo ideal entre frames
+      
         while self.running:
             start_time = time.time()
 
@@ -81,10 +82,11 @@ class VideoStream:
 
                     # Aguarda um pequeno tempo para garantir que pegamos o frame mais recente
                     if time.time() - start_time >= frame_time:
+
                         break
 
             if ret:
-                
+
                 ret, buffer = cv2.imencode(".jpg", frame)
                 if ret:
                     self.buffer.append(buffer.tobytes())
@@ -166,6 +168,7 @@ def stream_video():
         )
 
     def generate():
+        frame_count = 0
         fps_limit = 10  # Limitar a 10 frames por segundo (ajustável)
         frame_interval = 1 / fps_limit
         last_frame_time = time.time()
@@ -176,6 +179,14 @@ def stream_video():
                 current_time = time.time()
                 if current_time - last_frame_time >= frame_interval:
                     last_frame_time = current_time
+                    frame_count += 1
+                    
+                    # Atualiza FPS a cada segundo
+                    if current_time - last_fps_time >= 1.0:
+                        fps_data[url] = frame_count  # Salva FPS no dicionário
+                        frame_count = 0
+                        last_fps_time = current_time
+                    
                     yield (
                         b"--frame\r\n"
                         b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n"
@@ -184,3 +195,12 @@ def stream_video():
                 time.sleep(0.1)  # Aguarda até que um frame esteja disponível
 
     return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")
+
+@visualizer_cam_v2.route("/stream_fps", methods=["GET"])
+def get_stream_fps():
+    url = request.args.get("url")
+    if not url or url not in fps_data:
+        return jsonify({"message": "Stream não encontrado ou sem FPS registrado."}), 404
+
+    return jsonify({"url": url, "fps": fps_data[url]})
+
