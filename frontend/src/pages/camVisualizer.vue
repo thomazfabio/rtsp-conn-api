@@ -10,5 +10,5 @@
 </template>
 
 <script setup>
-import searchCamV1 from '../components/searchCam/searchCamV1.vue';
+import searchCamV1 from '../components/manageCam/searchAndManageCamV1.vue';
 </script>
