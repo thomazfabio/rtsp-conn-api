@@ -1,240 +1,196 @@
 <template>
-    <v-card>
-        <v-data-table :headers="headers" :items="desserts" :sort-by="[{ key: 'calories', order: 'asc' }]">
-            <template v-slot:top>
-                <v-toolbar flat>
-                    <v-toolbar-title>My CRUD</v-toolbar-title>
-                    <v-divider class="mx-4" inset vertical></v-divider>
-                    <v-spacer></v-spacer>
-                    <v-dialog v-model="dialog" max-width="500px">
-                        <template v-slot:activator="{ props }">
-                            <v-btn class="mb-2" color="primary" v-bind="props">
-                                New Item
-                            </v-btn>
-                        </template>
-                        <v-card>
-                            <v-card-title>
-                                <span class="text-h5">{{ formTitle }}</span>
-                            </v-card-title>
+    <v-alert v-if="alerts.alertEdit.status" closable variant="outlined" :type="alerts.alertEdit.type" dismissible>
+        {{ alerts.alertEdit.message }}
+    </v-alert>
+    <v-data-table-server v-model:items-per-page="itemsPerPage" :headers="headers" :items="serverItems"
+        :items-length="totalItems" :loading="loading" :search="search" item-value="name" @update:options="loadItems">
+        <template v-slot:item.actions="{ item }">
+            <v-row class="d-flex justify-end">
+                <v-dialog v-model="dialogEdit" max-width="490" persistent opacity="0.1">
+                    <template v-slot:activator="{ props: activatorProps }">
 
-                            <v-card-text>
-                                <v-container>
-                                    <v-row>
-                                        <v-col cols="12" md="4" sm="6">
-                                            <v-text-field v-model="editedItem.name"
-                                                label="Dessert name"></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" md="4" sm="6">
-                                            <v-text-field v-model="editedItem.calories"
-                                                label="Calories"></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" md="4" sm="6">
-                                            <v-text-field v-model="editedItem.fat" label="Fat (g)"></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" md="4" sm="6">
-                                            <v-text-field v-model="editedItem.carbs"
-                                                label="Carbs (g)"></v-text-field>
-                                        </v-col>
-                                        <v-col cols="12" md="4" sm="6">
-                                            <v-text-field v-model="editedItem.protein"
-                                                label="Protein (g)"></v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                </v-container>
-                            </v-card-text>
+                        <v-icon v-bind="activatorProps" color="primary" @click="openEditDialog(item)" small class="mr-4"
+                            v-tooltip="'clique aqui para editar'">
+                            mdi-pencil-outline
+                        </v-icon>
+                    </template>
+                    <v-card>
+                        <v-card-title>Editar Dispositivo</v-card-title>
+                        <v-container>
+                            <v-row>
+                                <v-col>
+                                    <span class="text-justify" style="text-align: justify; display: block;">
+                                        Editar Dispositivo Base.
+                                    </span>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    <v-text-field :model-value="selectedItem.fabricante"
+                                        @update:model-value="(val) => inEdit.fabricante = val" label="Fabricante"
+                                        variant="outlined"></v-text-field>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    <v-text-field :model-value="selectedItem.modelo"
+                                        @update:model-value="(val) => inEdit.modelo = val" label="Modelo"
+                                        variant="outlined"></v-text-field>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    <v-text-field :model-value="selectedItem.path_rtsp"
+                                        @update:model-value="(val) => inEdit.path_rtsp = val" label="Path RTSP"
+                                        variant="outlined"></v-text-field>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    <v-text-field :model-value="selectedItem.versao"
+                                        @update:model-value="(val) => inEdit.versao = val" label="Versão"
+                                        variant="outlined"></v-text-field>
+                                </v-col>
+                            </v-row>
+                        </v-container>
+                        <v-card-actions>
+                            <v-btn color="red" @click="dialogEdit = false">cancelar</v-btn>
+                            <v-btn color="green" @click="editDevice(selectedItem)">salvar</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+                <v-dialog v-model="dialogDelete" max-width="450" persistent opacity="0.1">
+                    <template v-slot:activator="{ props: activatorProps }">
+                        <v-icon @click="openDeleteDialog(item)" v-bind="activatorProps" color="red" small
+                            v-tooltip="'clique aqui para deletar'">
+                            mdi-trash-can-outline
+                        </v-icon>
+                    </template>
+                    <v-card>
+                        <v-card-title>Tem certeza que deseja deletar o dispositivo?</v-card-title>
+                        <v-card-text>
+                            <v-row>
+                                <v-col>
+                                    Fabricante: {{ selectedItem.fabricante }}
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col>
+                                    Modelo: {{ selectedItem.modelo }}
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-btn color="green" @click="dialogDelete = false">Cancelar</v-btn>
+                            <v-btn color="red" @click="deleteDevice(selectedItem.id)">Deletar</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+            </v-row>
+        </template>
 
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn color="blue-darken-1" variant="text" @click="close">
-                                    Cancel
-                                </v-btn>
-                                <v-btn color="blue-darken-1" variant="text" @click="save">
-                                    Save
-                                </v-btn>
-                            </v-card-actions>
-                        </v-card>
-                    </v-dialog>
-                    <v-dialog v-model="dialogDelete" max-width="500px">
-                        <v-card>
-                            <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
-                            <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn color="blue-darken-1" variant="text" @click="closeDelete">Cancel</v-btn>
-                                <v-btn color="blue-darken-1" variant="text" @click="deleteItemConfirm">OK</v-btn>
-                                <v-spacer></v-spacer>
-                            </v-card-actions>
-                        </v-card>
-                    </v-dialog>
-                </v-toolbar>
-            </template>
-            <template v-slot:item.actions="{ item }">
-                <v-icon class="me-2" size="small" @click="editItem(item)">
-                    mdi-pencil
-                </v-icon>
-                <v-icon size="small" @click="deleteItem(item)">
-                    mdi-delete
-                </v-icon>
-            </template>
-            <template v-slot:no-data>
-                <v-btn color="primary" @click="initialize">
-                    Reset
-                </v-btn>
-            </template>
-        </v-data-table>
-    </v-card>
+    </v-data-table-server>
 </template>
 
 <script setup>
-import { computed, nextTick, ref, watch } from 'vue'
-const dialog = ref(false)
-const dialogDelete = ref(false)
-const headers = ref([
-{
-    title: 'Dessert (100g serving)',
-    align: 'start',
-    sortable: false,
-    key: 'name',
-},
-{ title: 'Calories', key: 'calories' },
-{ title: 'Fat (g)', key: 'fat' },
-{ title: 'Carbs (g)', key: 'carbs' },
-{ title: 'Protein (g)', key: 'protein' },
-{ title: 'Actions', key: 'actions', sortable: false },
-])
-const desserts = ref([])
-const editedIndex = ref(-1)
-const editedItem = ref({
-name: '',
-calories: 0,
-fat: 0,
-carbs: 0,
-protein: 0,
-})
-const defaultItem = ref({
-name: '',
-calories: 0,
-fat: 0,
-carbs: 0,
-protein: 0,
-})
-const formTitle = computed(() => {
-return editedIndex.value === -1 ? 'New Item' : 'Edit Item'
-})
-function initialize() {
-desserts.value = [
-    {
-        name: 'Frozen Yogurt',
-        calories: 159,
-        fat: 6,
-        carbs: 24,
-        protein: 4,
-    },
-    {
-        name: 'Ice cream sandwich',
-        calories: 237,
-        fat: 9,
-        carbs: 37,
-        protein: 4.3,
-    },
-    {
-        name: 'Eclair',
-        calories: 262,
-        fat: 16,
-        carbs: 23,
-        protein: 6,
-    },
-    {
-        name: 'Cupcake',
-        calories: 305,
-        fat: 3.7,
-        carbs: 67,
-        protein: 4.3,
-    },
-    {
-        name: 'Gingerbread',
-        calories: 356,
-        fat: 16,
-        carbs: 49,
-        protein: 3.9,
-    },
-    {
-        name: 'Jelly bean',
-        calories: 375,
-        fat: 0,
-        carbs: 94,
-        protein: 0,
-    },
-    {
-        name: 'Lollipop',
-        calories: 392,
-        fat: 0.2,
-        carbs: 98,
-        protein: 0,
-    },
-    {
-        name: 'Honeycomb',
-        calories: 408,
-        fat: 3.2,
-        carbs: 87,
-        protein: 6.5,
-    },
-    {
-        name: 'Donut',
-        calories: 452,
-        fat: 25,
-        carbs: 51,
-        protein: 4.9,
-    },
-    {
-        name: 'KitKat',
-        calories: 518,
-        fat: 26,
-        carbs: 65,
-        protein: 7,
-    },
+import { onBeforeMount, onMounted, ref } from 'vue'
+import { useManageDeviceInfoStore } from '../..//stores/deviceManage/manageDeviceInfo'
+const storeManageDevice = useManageDeviceInfoStore()
+
+const headers = [
+    { title: 'Fabricante', key: 'fabricante', sortable: false },
+    { title: 'Modelo', key: 'modelo', sortable: false },
+    { title: 'Path RTSP', key: 'path_rtsp', sortable: false },
+    { title: 'Versão', key: 'versao', sortable: false },
+    { title: 'Ações', key: 'actions', sortable: false, align: 'end' }
 ]
+
+const itemsPerPage = ref(10)
+const totalItems = ref(0)
+const loading = ref(false)
+const search = ref('')
+const serverItems = ref([])
+const selectedItem = ref(null)
+const dialogEdit = ref(false)
+const dialogDelete = ref(false)
+const inEdit = ref({})
+const alerts = ref({ alertEdit: { status: false, type:'', message:""  } })
+
+
+
+// dialogos de edição e exclusão
+
+const openEditDialog = (item) => {
+    selectedItem.value = item;
+    dialogEdit.value = true;
+    inEdit.value = { ...item }; // Copia os valores existentes
+};
+
+const openDeleteDialog = (item) => {
+    selectedItem.value = item;
+    dialogDelete.value = true;
+};
+
+
+// edit device
+const editDevice = async (item) => {
+    const { id } = item
+    const { fabricante, modelo, path_rtsp, versao } = inEdit.value
+    const data = { id, fabricante, modelo, path_rtsp, versao }
+    alerts.value.alertEdit.status = false
+    await storeManageDevice.updateDeviceInfoById(data).then((response) => {
+        if (response.status === 200) {
+            alerts.value.alertEdit.status = true
+            alerts.value.alertEdit.type = 'success'
+            alerts.value.alertEdit.message = 'Dispositivo editado com sucesso!'
+        } else {
+            alerts.value.alertEdit.status = true
+            alerts.value.alertEdit.type = 'error'
+            alerts.value.alertEdit.message = 'Erro ao editar dispositivo!'
+        }
+        dialogEdit.value = false
+        loadItems({ page: 1, itemsPerPage: 10, search: '' })
+    }).catch((error) => {
+        alerts.value.alertEdit.status = true
+        alerts.value.alertEdit.type = 'error'
+        alerts.value.alertEdit.message = 'Erro ao editar dispositivo!'
+        console.log(error)
+        dialogEdit.value = false
+    })
 }
-function editItem(item) {
-editedIndex.value = desserts.value.indexOf(item)
-editedItem.value = Object.assign({}, item)
-dialog.value = true
+
+// delete device
+const deleteDevice = async (id) => {
+    alerts.value.alertEdit.status = false
+    await storeManageDevice.deleteDeviceInfoById(id).then((response) => {
+        if (response.status === 200) {
+            alerts.value.alertEdit.status = true
+            alerts.value.alertEdit.type = 'success'
+            alerts.value.alertEdit.message = 'Dispositivo deletado com sucesso!'
+        } else {
+            alerts.value.alertEdit.status = true
+            alerts.value.alertEdit.type = 'error'
+            alerts.value.alertEdit.message = 'Erro ao deletar dispositivo!'
+        }
+        dialogDelete.value = false
+        loadItems({ page: 1, itemsPerPage: 10, search: '' })
+    }).catch((error) => {
+        alerts.value.alertEdit.status = true
+        alerts.value.alertEdit.type = 'error'
+        alerts.value.alertEdit.message = 'Erro ao deletar dispositivo!'
+        console.log(error)
+        dialogDelete.value = false
+    })
 }
-function deleteItem(item) {
-editedIndex.value = desserts.value.indexOf(item)
-editedItem.value = Object.assign({}, item)
-dialogDelete.value = true
+
+
+const loadItems = async ({ page, itemsPerPage, search }) => {
+    loading.value = true
+    await storeManageDevice.searchDeviceInfoAll().then((response) => {
+        console.log(response.data)
+        serverItems.value = response.data
+        totalItems.value = response.data.length
+        loading.value = false
+    })
 }
-function deleteItemConfirm() {
-desserts.value.splice(editedIndex.value, 1)
-closeDelete()
-}
-function close() {
-dialog.value = false
-nextTick(() => {
-    editedItem.value = Object.assign({}, defaultItem.value)
-    editedIndex.value = -1
-})
-}
-function closeDelete() {
-dialogDelete.value = false
-nextTick(() => {
-    editedItem.value = Object.assign({}, defaultItem.value)
-    editedIndex.value = -1
-})
-}
-function save() {
-if (editedIndex.value > -1) {
-    Object.assign(desserts.value[editedIndex.value], editedItem.value)
-} else {
-    desserts.value.push(editedItem.value)
-}
-close()
-}
-watch(dialog, val => {
-val || close()
-})
-watch(dialogDelete, val => {
-val || closeDelete()
-})
-initialize()
 </script>
