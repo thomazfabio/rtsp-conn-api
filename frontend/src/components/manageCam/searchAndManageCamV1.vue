@@ -1,10 +1,9 @@
 <template>
-    <div class="text-h5 mb-3">Aqui você pode listar e encontrar suas câmeras</div>
     <v-toolbar bordder density="compact">
-        <v-btn color="primary" @click="setSearchType('all')" variant="text">
+        <v-btn prepend-icon="mdi-magnify" color="primary" @click="setSearchType('all')" variant="text">
             buscar todas
         </v-btn>
-        <v-btn color="primary" @click="searchCamByUserId(auxItemsPerPage)" variant="text">
+        <v-btn prepend-icon="mdi-refresh" color="primary" @click="searchCamByUserId(auxItemsPerPage)" variant="text">
             Atualizar
         </v-btn>
     </v-toolbar>
@@ -23,10 +22,11 @@
     <v-container v-if="searchType" class="pl-0 pr-0">
         <v-row v-if="searchType == 'all'">
             <v-col>
-                <v-data-table-server :items-per-page="itemsPerPage" :items-per-page-options="itemsPerPageOptions"
-                    :items-length="totalItems" :headers="headers" color="blue" item-key="name"
-                    items-per-page-text="items por página" loading-text="Loading... Please wait" :loading="loading"
-                    :items="serverItems" @update:options="(options) => searchCamByUserId(options)">
+                <v-data-table-server :mobile="isMobile" :items-per-page="itemsPerPage"
+                    :items-per-page-options="itemsPerPageOptions" :items-length="totalItems" :headers="headers"
+                    color="blue" item-key="name" items-per-page-text="items por página"
+                    loading-text="Loading... Please wait" :loading="loading" :items="serverItems"
+                    @update:options="(options) => searchCamByUserId(options)">
                     <template v-slot:item.full_cam_url_stream="{ item }">
                         <span v-tooltip="'clique aqui para copiar a URL'" class="url-link"
                             @click="openVerUrlDialog(item)">
@@ -49,77 +49,78 @@
 
                     </template>
                     <template v-slot:item.actions="{ item }">
-                        <v-dialog v-model="dialogEdit" max-width="490" persistent opacity="0.1">
-                            <template v-slot:activator="{ props: activatorProps }">
+                        <v-row class="d-flex justify-end">
+                            <v-dialog v-model="dialogEdit" max-width="490" persistent opacity="0.1">
+                                <template v-slot:activator="{ props: activatorProps }">
 
-                                <v-icon v-bind="activatorProps" color="primary" @click="openEditDialog(item)" small
-                                    class="mr-4" v-tooltip="'clique aqui para editar'">
-                                    mdi-pencil-outline
-                                </v-icon>
-                            </template>
-                            <v-card>
-                                <v-card-title>Editar Câmera</v-card-title>
-                                <v-container>
-                                    <v-row>
-                                        <v-col>
-                                            <span class="text-justify" style="text-align: justify; display: block;">
-                                                <v-icon color="orange">mdi-alert-outline</v-icon>
-                                                Você pode editar o nome da câmera e o grupo, se precisar de mudanças
-                                                avançadas,
-                                                exclua e adicione
-                                                novamente a câmera.
-                                            </span>
-                                        </v-col>
-                                    </v-row>
-                                    <v-row>
-                                        <v-col>
-                                            <v-text-field :model-value="selectedItem.cam_name"
-                                                @update:model-value="(val) => inEdit.cam_name = val"
-                                                label="Nome da Câmera" variant="outlined"></v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                    <v-row>
-                                        <v-col>
-                                            <v-text-field :model-value="selectedItem.grupo"
-                                                @update:model-value="(val) => inEdit.grupo = val" label="Grupo"
-                                                variant="outlined"></v-text-field>
-                                        </v-col>
-                                    </v-row>
-                                </v-container>
-                                <v-card-actions>
-                                    <v-btn color="red" @click="dialogEdit = false">cancelar</v-btn>
-                                    <v-btn color="green" @click="editCam(selectedItem)">salvar</v-btn>
-                                </v-card-actions>
-                            </v-card>
-                        </v-dialog>
-                        <v-dialog v-model="dialogDelete" max-width="450" persistent opacity="0.1">
-                            <template v-slot:activator="{ props: activatorProps }">
-                                <v-icon @click="openDeleteDialog(item)" v-bind="activatorProps" color="red" small
-                                    v-tooltip="'clique aqui para deletar'">
-                                    mdi-trash-can-outline
-                                </v-icon>
-                            </template>
-                            <v-card>
-                                <v-card-title>Tem certeza que deseja deletar a câmera?</v-card-title>
-                                <v-card-text>
-                                    <v-row>
-                                        <v-col>
-                                            Câmera: {{ selectedItem.cam_name }}
-                                        </v-col>
-                                    </v-row>
-                                    <v-row>
-                                        <v-col>
-                                            Grupo: {{ selectedItem.grupo }}
-                                        </v-col>
-                                    </v-row>
-                                </v-card-text>
-                                <v-card-actions>
-                                    <v-btn color="green" @click="dialogDelete = false">Cancelar</v-btn>
-                                    <v-btn color="red" @click="deleteCam(selectedItem.id)">Deletar</v-btn>
-                                </v-card-actions>
-                            </v-card>
-                        </v-dialog>
-
+                                    <v-icon v-bind="activatorProps" color="primary" @click="openEditDialog(item)" small
+                                        class="mr-4" v-tooltip="'clique aqui para editar'">
+                                        mdi-pencil-outline
+                                    </v-icon>
+                                </template>
+                                <v-card>
+                                    <v-card-title>Editar Câmera</v-card-title>
+                                    <v-container>
+                                        <v-row>
+                                            <v-col>
+                                                <span class="text-justify" style="text-align: justify; display: block;">
+                                                    <v-icon color="orange">mdi-alert-outline</v-icon>
+                                                    Você pode editar o nome da câmera e o grupo, se precisar de mudanças
+                                                    avançadas,
+                                                    exclua e adicione
+                                                    novamente a câmera.
+                                                </span>
+                                            </v-col>
+                                        </v-row>
+                                        <v-row>
+                                            <v-col>
+                                                <v-text-field :model-value="selectedItem.cam_name"
+                                                    @update:model-value="(val) => inEdit.cam_name = val"
+                                                    label="Nome da Câmera" variant="outlined"></v-text-field>
+                                            </v-col>
+                                        </v-row>
+                                        <v-row>
+                                            <v-col>
+                                                <v-text-field :model-value="selectedItem.grupo"
+                                                    @update:model-value="(val) => inEdit.grupo = val" label="Grupo"
+                                                    variant="outlined"></v-text-field>
+                                            </v-col>
+                                        </v-row>
+                                    </v-container>
+                                    <v-card-actions>
+                                        <v-btn color="red" @click="dialogEdit = false">cancelar</v-btn>
+                                        <v-btn color="green" @click="editCam(selectedItem)">salvar</v-btn>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-dialog>
+                            <v-dialog v-model="dialogDelete" max-width="450" persistent opacity="0.1">
+                                <template v-slot:activator="{ props: activatorProps }">
+                                    <v-icon @click="openDeleteDialog(item)" v-bind="activatorProps" color="red" small
+                                        v-tooltip="'clique aqui para deletar'">
+                                        mdi-trash-can-outline
+                                    </v-icon>
+                                </template>
+                                <v-card>
+                                    <v-card-title>Tem certeza que deseja deletar a câmera?</v-card-title>
+                                    <v-card-text>
+                                        <v-row>
+                                            <v-col>
+                                                Câmera: {{ selectedItem.cam_name }}
+                                            </v-col>
+                                        </v-row>
+                                        <v-row>
+                                            <v-col>
+                                                Grupo: {{ selectedItem.grupo }}
+                                            </v-col>
+                                        </v-row>
+                                    </v-card-text>
+                                    <v-card-actions>
+                                        <v-btn color="green" @click="dialogDelete = false">Cancelar</v-btn>
+                                        <v-btn color="red" @click="deleteCam(selectedItem.id)">Deletar</v-btn>
+                                    </v-card-actions>
+                                </v-card>
+                            </v-dialog>
+                        </v-row>
                     </template>
                 </v-data-table-server>
             </v-col>
@@ -131,6 +132,10 @@
 <script setup>
 import { onBeforeMount, ref, watch } from 'vue';
 import { useSearchCamStore } from '../../stores/deviceManage/searchCam';
+import { useDisplay } from 'vuetify';
+
+const { xs } = useDisplay();
+const isMobile = computed(() => xs.value);
 const searchType = ref(null);
 const loading = ref(false);
 const alerts = ref({
@@ -147,7 +152,6 @@ const itemsPerPage = ref(5);
 const totalItems = ref(0);
 const auxItemsPerPage = ref(5);
 const auxPage = ref(1);
-
 
 
 const storeSearchCam = useSearchCamStore();

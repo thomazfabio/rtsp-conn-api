@@ -1,28 +1,30 @@
 <template>
-
     <v-container>
-        <v-card>
-            <v-card-title>Configurações gerais</v-card-title>
-            <v-divider />
-            <v-row>
-                <v-col>
-                    <v-btn color="primary" @click="isManagerCam = !isManagerCam">Gerenciar Câmeras</v-btn>
-                </v-col>
+        <v-expansion-panels>
+            <v-expansion-panel title="Gerenciar Câmeras" text="Aqui você pode adicionar, remover e gerenciar câmeras.">
+                <v-expansion-panel-text>
+                    <v-row class="mb-3">
+                        <v-col lg="3" md="4" sm="6">
+                            <v-btn color="primary" block prepend-icon="mdi-clipboard-alert-outline"
+                                @click="isManagerCam = !isManagerCam">Gerenciar
+                                Câmeras</v-btn>
+                        </v-col>
 
-                <v-col>
-                    <v-btn color="primary" @click="isManagerDeviceInfo = !isManagerDeviceInfo">Gerenciar
-                        Dispositivos</v-btn>
-                </v-col>
-            </v-row>
-            <v-divider />
-            <v-container>
+                        <v-col lg="3" md="4" sm="6">
+                            <v-btn color="success" block prepend-icon="mdi-plus" to="/connectCam">Adicionar
+                                Câmera</v-btn>
+                        </v-col>
+                    </v-row>
 
-                <searchAndManageCamV1 v-if="isManagerCam" />
-                <manageDeviceInfo v-if="isManagerDeviceInfo" />
-            </v-container>
-        </v-card>
+                    <searchAndManageCamV1 v-if="isManagerCam" />
+                </v-expansion-panel-text>
+
+            </v-expansion-panel>
+            <v-expansion-panel title="Gerenciar Dispositivos"
+                text="Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, ratione debitis quis est labore voluptatibus! Eaque cupiditate minima">
+            </v-expansion-panel>
+        </v-expansion-panels>
     </v-container>
-
 </template>
 
 <script setup>

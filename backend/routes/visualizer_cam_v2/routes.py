@@ -60,7 +60,7 @@ class VideoStream:
         return True
 
     def _read_frames(self):
-        target_fps = 15  # FPS desejado
+        target_fps = 30  # FPS desejado
         frame_time = 1.0 / target_fps  # Tempo ideal entre frames
 
         while self.running:
@@ -172,7 +172,7 @@ def stream_video():
         )
 
     def generate():
-            fps_limit = 15  # Limitar a 10 frames por segundo (ajustável)
+            fps_limit = 30  # Limitar a 10 frames por segundo (ajustável)
             frame_interval = 1 / fps_limit
             last_frame_time = time.time()
 
