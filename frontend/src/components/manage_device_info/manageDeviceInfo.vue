@@ -1,9 +1,75 @@
 <template>
-    <v-alert v-if="alerts.alertEdit.status" closable variant="outlined" :type="alerts.alertEdit.type" dismissible>
+    <v-alert v-if="alerts.alertEdit.status" closable variant="outlined" :type="alerts.alertEdit.type" dismissible
+        class="mb-4">
         {{ alerts.alertEdit.message }}
     </v-alert>
-    <v-data-table-server v-model:items-per-page="itemsPerPage" :headers="headers" :items="serverItems"
-        :items-length="totalItems" :loading="loading" :search="search" item-value="name" @update:options="loadItems">
+    <v-data-table-server :mobile="isMobile" v-model:items-per-page="itemsPerPage" :headers="headers"
+        :items="serverItems" :items-length="totalItems" :loading="loading" :search="search" item-value="name"
+        @update:options="loadItems">
+
+        <template v-slot:top>
+            <v-sheet color="grey-darken-2" rounded="lg" class="pa-2">
+                <v-row>
+                    <v-col class="d-flex align-center" cols="12" lg="6" md="6" sm="6">
+                        <h4 class="text-h5 font-weight-bold">Gerenciar dispositivo base</h4>
+                    </v-col>
+                    <v-col cols="12" lg="6" md="6" sm="6" class="d-flex flex-row-reverse">  
+                        <v-dialog v-model="dialogNewDevice" max-width="490" persistent opacity="0.1">
+                            <template v-slot:activator="{ attrs }">
+
+                                <v-btn :block="isMobile" color="success" v-bind="attrs" @click="dialogNewDevice = true"
+                                    prepend-icon="mdi-plus-circle-outline" variant="flat">
+                                    Adicionar
+                                </v-btn>
+
+                            </template>
+                            <v-card>
+                                <v-card-title>Adicionar novo Dispositivo</v-card-title>
+                                <v-container>
+                                    <v-row>
+                                        <v-col>
+                                            <span class="text-justify" style="text-align: justify; display: block;">
+                                                Adicionar novo Dispositivo Base.
+                                            </span>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col>
+                                            <v-text-field v-model="deviceInfo.fabricante" label="Fabricante"
+                                                variant="outlined"></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col>
+                                            <v-text-field v-model="deviceInfo.modelo" label="Modelo"
+                                                variant="outlined"></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col>
+                                            <v-text-field v-model="deviceInfo.path_rtsp" label="Path RTSP"
+                                                variant="outlined"></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row>
+                                        <v-col>
+                                            <v-text-field v-model="deviceInfo.versao" label="Versão"
+                                                variant="outlined"></v-text-field>
+                                        </v-col>
+                                    </v-row>
+                                </v-container>
+                                <v-card-actions>
+                                    <v-btn color="red" @click="dialogNewDevice = false">cancelar</v-btn>
+                                    <v-btn color="green" @click="addDevice(deviceInfo)">salvar</v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </v-dialog>
+                    </v-col>
+                </v-row>
+            </v-sheet>
+        </template>
+
+
         <template v-slot:item.actions="{ item }">
             <v-row class="d-flex justify-end">
                 <v-dialog v-model="dialogEdit" max-width="490" persistent opacity="0.1">
@@ -93,9 +159,14 @@
 </template>
 
 <script setup>
-import { onBeforeMount, onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useManageDeviceInfoStore } from '../..//stores/deviceManage/manageDeviceInfo'
 const storeManageDevice = useManageDeviceInfoStore()
+import { useDisplay } from 'vuetify'
+import { computed } from 'vue'
+
+const { xs } = useDisplay();
+const isMobile = computed(() => xs.value);
 
 const headers = [
     { title: 'Fabricante', key: 'fabricante', sortable: false },
@@ -111,10 +182,14 @@ const loading = ref(false)
 const search = ref('')
 const serverItems = ref([])
 const selectedItem = ref(null)
+const dialogNewDevice = ref(false)
 const dialogEdit = ref(false)
 const dialogDelete = ref(false)
 const inEdit = ref({})
-const alerts = ref({ alertEdit: { status: false, type:'', message:""  } })
+const alerts = ref({ alertEdit: { status: false, type: '', message: "" } })
+const deviceInfo = ref({ fabricante: '', modelo: '', path_rtsp: '', versao: '' })
+
+
 
 
 
@@ -131,6 +206,32 @@ const openDeleteDialog = (item) => {
     dialogDelete.value = true;
 };
 
+// add device
+const addDevice = async (item) => {
+    const { fabricante, modelo, path_rtsp, versao } = item
+    const data = { fabricante, modelo, path_rtsp, versao }
+    alerts.value.alertEdit.status = false
+    await storeManageDevice.createDeviceInfo(data).then((response) => {
+        console.log(response)
+        if (response.status === 201) {
+            alerts.value.alertEdit.status = true
+            alerts.value.alertEdit.type = 'success'
+            alerts.value.alertEdit.message = 'Dispositivo adicionado com sucesso!'
+        } else {
+            alerts.value.alertEdit.status = true
+            alerts.value.alertEdit.type = 'error'
+            alerts.value.alertEdit.message = 'Erro ao adicionar dispositivo!'
+        }
+        dialogNewDevice.value = false
+        loadItems({ page: 1, itemsPerPage: 10, search: '' })
+    }).catch((error) => {
+        alerts.value.alertEdit.status = true
+        alerts.value.alertEdit.type = 'error'
+        alerts.value.alertEdit.message = 'Erro ao adicionar dispositivo!'
+        console.log(error)
+        dialogNewDevice.value = false
+    })
+}
 
 // edit device
 const editDevice = async (item) => {
@@ -165,7 +266,7 @@ const deleteDevice = async (id) => {
     await storeManageDevice.deleteDeviceInfoById(id).then((response) => {
         if (response.status === 200) {
             alerts.value.alertEdit.status = true
-            alerts.value.alertEdit.type = 'success'
+            alerts.value.alertEdit.type = 'warning'
             alerts.value.alertEdit.message = 'Dispositivo deletado com sucesso!'
         } else {
             alerts.value.alertEdit.status = true
@@ -194,3 +295,5 @@ const loadItems = async ({ page, itemsPerPage, search }) => {
     })
 }
 </script>
+
+<style scoped></style>

@@ -4,6 +4,18 @@ const api = api_url_rtsp;
 
 export const useManageDeviceInfoStore = defineStore("manage-device-info", () => {
 
+    async function createDeviceInfo(data) {
+        const endpoint = "device_info/create";
+        try {
+            const response = await api.post(endpoint, data);
+            return response;
+        } catch (error) {
+            console.error("Erro na requisição:", error);
+            throw error;
+        }
+    }
+
+
     async function searchDeviceInfoAll() {
         const endpoint = "device_info/get_all";
         try {
@@ -49,6 +61,6 @@ export const useManageDeviceInfoStore = defineStore("manage-device-info", () => 
         }
     }
 
-    return { searchDeviceInfoAll, searchDeviceInfoByUserId, deleteDeviceInfoById, updateDeviceInfoById };
+    return { createDeviceInfo, searchDeviceInfoAll, searchDeviceInfoByUserId, deleteDeviceInfoById, updateDeviceInfoById };
 }
 );
