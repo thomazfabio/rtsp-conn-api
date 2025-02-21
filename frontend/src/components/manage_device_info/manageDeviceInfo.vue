@@ -5,7 +5,8 @@
     </v-alert>
     <v-data-table-server :mobile="isMobile" v-model:items-per-page="itemsPerPage" :headers="headers"
         :items="serverItems" :items-length="totalItems" :loading="loading" :search="search" item-value="name"
-        @update:options="loadItems">
+        @update:options="loadItems" :items-per-page-options="itemsPerPageOptions" items-per-page-text="items por página"
+        loading-text="Loading... Please wait">
 
         <template v-slot:top>
             <v-sheet color="grey-darken-2" rounded="lg" class="pa-2">
@@ -13,7 +14,7 @@
                     <v-col class="d-flex align-center" cols="12" lg="6" md="6" sm="6">
                         <h4 class="text-h5 font-weight-bold">Gerenciar dispositivo base</h4>
                     </v-col>
-                    <v-col cols="12" lg="6" md="6" sm="6" class="d-flex flex-row-reverse">  
+                    <v-col cols="12" lg="6" md="6" sm="6" class="d-flex flex-row-reverse">
                         <v-dialog v-model="dialogNewDevice" max-width="490" persistent opacity="0.1">
                             <template v-slot:activator="{ attrs }">
 
@@ -165,6 +166,7 @@ const storeManageDevice = useManageDeviceInfoStore()
 import { useDisplay } from 'vuetify'
 import { computed } from 'vue'
 
+const itemsPerPageOptions = [{ title: '5', value: 5 }, { title: '10', value: 10 }, { title: '15', value: 15 }, { title: '20', value: 20 }, { title: 'todos', value: -1 }];
 const { xs } = useDisplay();
 const isMobile = computed(() => xs.value);
 
@@ -176,7 +178,7 @@ const headers = [
     { title: 'Ações', key: 'actions', sortable: false, align: 'end' }
 ]
 
-const itemsPerPage = ref(10)
+const itemsPerPage = ref(5)
 const totalItems = ref(0)
 const loading = ref(false)
 const search = ref('')
@@ -188,6 +190,8 @@ const dialogDelete = ref(false)
 const inEdit = ref({})
 const alerts = ref({ alertEdit: { status: false, type: '', message: "" } })
 const deviceInfo = ref({ fabricante: '', modelo: '', path_rtsp: '', versao: '' })
+const auxPage = ref(1)
+const auxItemsPerPage = ref(5)
 
 
 
@@ -223,7 +227,7 @@ const addDevice = async (item) => {
             alerts.value.alertEdit.message = 'Erro ao adicionar dispositivo!'
         }
         dialogNewDevice.value = false
-        loadItems({ page: 1, itemsPerPage: 10, search: '' })
+        loadItems({ auxPage, auxItemsPerPage})
     }).catch((error) => {
         alerts.value.alertEdit.status = true
         alerts.value.alertEdit.type = 'error'
@@ -250,7 +254,7 @@ const editDevice = async (item) => {
             alerts.value.alertEdit.message = 'Erro ao editar dispositivo!'
         }
         dialogEdit.value = false
-        loadItems({ page: 1, itemsPerPage: 10, search: '' })
+        loadItems({ auxPage, auxItemsPerPage})
     }).catch((error) => {
         alerts.value.alertEdit.status = true
         alerts.value.alertEdit.type = 'error'
@@ -274,7 +278,7 @@ const deleteDevice = async (id) => {
             alerts.value.alertEdit.message = 'Erro ao deletar dispositivo!'
         }
         dialogDelete.value = false
-        loadItems({ page: 1, itemsPerPage: 10, search: '' })
+        loadItems({ auxPage, auxItemsPerPage})
     }).catch((error) => {
         alerts.value.alertEdit.status = true
         alerts.value.alertEdit.type = 'error'
@@ -285,12 +289,24 @@ const deleteDevice = async (id) => {
 }
 
 
-const loadItems = async ({ page, itemsPerPage, search }) => {
+const loadItems = async ({ page = auxPage.value, itemsPerPage = auxItemsPerPage.value } = {}) => {
+    auxPage.value = page
+    auxItemsPerPage.value = itemsPerPage
     loading.value = true
-    await storeManageDevice.searchDeviceInfoAll().then((response) => {
-        console.log(response.data)
-        serverItems.value = response.data
-        totalItems.value = response.data.length
+    const dataShowInTable = [ 'id','fabricante', 'modelo', 'path_rtsp', 'versao']
+    await storeManageDevice.searchDeviceInfoAll().then((res) => {
+        console.log(res.data)
+        const dataFilter = res.data.map((item) => {
+            return dataShowInTable.reduce((acc, key) => {
+                acc[key] = item[key];
+                return acc;
+            }, {});
+        });
+        // Paginação manual (caso a API não pagine automaticamente)
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = itemsPerPage === -1 ? totalItems.value : startIndex + itemsPerPage;
+        serverItems.value = dataFilter.slice(startIndex, endIndex);
+        totalItems.value = res.data.length
         loading.value = false
     })
 }
