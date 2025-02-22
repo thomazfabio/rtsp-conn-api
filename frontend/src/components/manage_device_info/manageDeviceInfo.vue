@@ -9,10 +9,10 @@
         loading-text="Loading... Please wait">
 
         <template v-slot:top>
-            <v-sheet color="grey-darken-2" rounded="lg" class="pa-2">
+            <v-sheet border="md opacity-12" rounded="lg" class="pa-2">
                 <v-row>
                     <v-col class="d-flex align-center" cols="12" lg="6" md="6" sm="6">
-                        <h4 class="text-h5 font-weight-bold">Gerenciar dispositivo base</h4>
+                        <h4 class="text-h5 font-weight-bold pl-1">Gerenciar dispositivo base</h4>
                     </v-col>
                     <v-col cols="12" lg="6" md="6" sm="6" class="d-flex flex-row-reverse">
                         <v-dialog v-model="dialogNewDevice" max-width="490" persistent opacity="0.1">
