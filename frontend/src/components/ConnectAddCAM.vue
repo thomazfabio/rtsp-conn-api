@@ -1,12 +1,13 @@
 <template>
-  <v-stepper :mobile="isMobile"  hide-actions ref="stepper" :items="['Passo 1', 'Passo 2', 'Passo 3', 'Passo 4']" v-model="step">
+  <v-stepper :mobile="isMobile" hide-actions ref="stepper" :items="['Passo 1', 'Passo 2', 'Passo 3', 'Passo 4']"
+    v-model="step">
     <template v-slot:item.1>
       <v-card title="Tipo de dispositivo" flat>
         <v-row>
           <v-container>
             <v-col cols="12" lg="6" md="6" sm="8">
-              <v-select label="Selecione o tipo"
-                :items="['DVR', 'Camera IP', 'URL da Web']" variant="outlined" v-model="selectedDeviceType"></v-select>
+              <v-select label="Selecione o tipo" :items="['DVR', 'Camera IP', 'URL da Web']" variant="outlined"
+                v-model="selectedDeviceType"></v-select>
             </v-col>
           </v-container>
         </v-row>
@@ -194,13 +195,18 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
+// import stores
 import { useCamUrlMenageStore } from "../stores/utils/camUrlMenage";
 import { useCreateCamFullDataStore } from "../stores/deviceManage/createCamFullData";
+import { useManageDeviceInfoStore } from "../stores/deviceManage/manageDeviceInfo";
 import camSimpleVisualizer from "./camVizualizer/camSimpleVisualizer.vue";
 import { useDisplay } from "vuetify";
 
+// instanciando stores
+const storeManageDeviceInfo = useManageDeviceInfoStore();
 const storeCamUrlMenage = useCamUrlMenageStore();
 const storeCreateCamFullData = useCreateCamFullDataStore();
+
 const { xs } = useDisplay();
 const isMobile = computed(() => xs.value);
 
@@ -221,12 +227,56 @@ const preferedStream = ref(false);
 const urlStreamReady = ref(null);
 const loading = ref({ await_status_url: false, await_status_save_cam: false });
 const alerts = ref({ alert_teste_url: { type: "", status: false, msg: "" }, alert_save_cam: { type: "", status: false, msg: "" } });
+const manufacturers = ref([]);
+
+
+// Lista de dispositivos carregados do backend
+const allDevices = ref([]);
 
 
 //observando mudanças
 watch([selectedManufacturer, selectedModel], ([newManufacturer, newModel]) => {
-  if (newManufacturer === "Intelbras" && newModel === "HDCVI 1004 G2") {
+  if (newManufacturer === "intelbras" && newModel === "HDCVI 1004 G2") {
     deviceFullInfo.value.path = "cam/realmonitor";
+  }
+});
+
+//carrega dados do dispositivo
+watch(selectedDeviceType, async (newVal) => {
+  if (newVal === "DVR") {
+    console.log("DVR selecionado");
+    const device = await storeManageDeviceInfo.searchDeviceInfoByType("dvr").then((res) => {
+      console.log(res.data);
+
+      // Armazena todos os dispositivos retornados
+      allDevices.value = res.data;
+
+      // Extrai os fabricantes e remove duplicatas
+      const uniqueManufacturers = [...new Set(res.data.map(item => item.fabricante))];
+
+      // Atualiza a variável reativa
+      manufacturers.value = uniqueManufacturers;
+    }).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  if (newVal === "Camera IP") {
+    console.log("Camera IP selecionada");
+    const device = await storeManageDeviceInfo.searchDeviceInfoByType("ip_cam").then((res) => {
+      console.log(res.data);
+    }).catch((err) => {
+      console.error(err);
+    });
+  }
+
+  if (newVal === "URL da Web") {
+    console.log("URL da Web selecionada");
+    const device = await storeManageDeviceInfo.searchDeviceInfoByType("web_url").then((res) => {
+      console.log(res.data);
+    }).catch((err) => {
+      console.error(err);
+    });
   }
 });
 
@@ -301,18 +351,26 @@ const goToPrevStep = () => {
 };
 
 //lidando com dvr passo 2
-// Lista de fabricantes
-const manufacturers = ["Intelbras"];
 
-// Modelos disponíveis por fabricante
-const modelsByManufacturer = {
-  Intelbras: ["HDCVI 1004 G2"],
-};
+// Observa mudanças no fabricante e modelo selecionados
+watch([selectedManufacturer, selectedModel], ([newManufacturer, newModel]) => {
+  if (newManufacturer && newModel) {
+    // Busca o dispositivo correspondente na lista carregada
+    const foundDevice = allDevices.value.find(
+      (item) => item.fabricante === newManufacturer && item.modelo === newModel
+    );
 
-// Computed para modelos dinâmicos
+    // Atualiza o path dinamicamente
+    deviceFullInfo.value.path = foundDevice ? foundDevice.path_rtsp : "";
+  }
+});
+
+// Computed para obter os modelos conforme o fabricante selecionado
 const models = computed(() => {
   return selectedManufacturer.value
-    ? modelsByManufacturer[selectedManufacturer.value] || []
+    ? allDevices.value
+      .filter(item => item.fabricante === selectedManufacturer.value)
+      .map(item => item.modelo)
     : [];
 });
 
