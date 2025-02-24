@@ -86,7 +86,7 @@ class VideoStream:
 
             if ret:
                 frame = cv2.resize(frame, (640, 480))
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 ret, buffer = cv2.imencode(
                     ".jpg",
                     frame,

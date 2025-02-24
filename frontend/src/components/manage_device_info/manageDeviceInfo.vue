@@ -25,13 +25,14 @@
 
                             </template>
                             <v-card>
-                                <v-card-title>Adicionar novo Dispositivo</v-card-title>
+                                <v-card-title>Adicionar novo dispositivo base</v-card-title>
+                                <v-divider />
                                 <v-container>
                                     <v-row>
                                         <v-col>
-                                            <span class="text-justify" style="text-align: justify; display: block;">
-                                                Adicionar novo Dispositivo Base.
-                                            </span>
+                                            <v-select v-model="deviceInfo.tipo" label="Tipo" variant="outlined"
+                                                :items="deviceTypes" item-title="label" item-value="value">
+                                            </v-select>
                                         </v-col>
                                     </v-row>
                                     <v-row>
@@ -61,7 +62,8 @@
                                 </v-container>
                                 <v-card-actions>
                                     <v-btn color="red" @click="dialogNewDevice = false">cancelar</v-btn>
-                                    <v-btn color="green" @click="addDevice(deviceInfo)">salvar</v-btn>
+                                    <v-btn color="green" :disabled="!isFormValid"
+                                        @click="addDevice(deviceInfo)">salvar</v-btn>
                                 </v-card-actions>
                             </v-card>
                         </v-dialog>
@@ -82,16 +84,14 @@
                         </v-icon>
                     </template>
                     <v-card>
-                        <v-card-title>Editar Dispositivo</v-card-title>
+                        <v-card-title>Editar dispositivo base</v-card-title>
+                        <v-divider />
                         <v-container>
                             <v-row>
                                 <v-col>
-                                    <span class="text-justify" style="text-align: justify; display: block;">
-                                        Editar Dispositivo Base.
-                                    </span>
+                                    <v-select :model-value="selectedItem.tipo" label="Tipo" variant="outlined"
+                                        readonly></v-select>
                                 </v-col>
-                            </v-row>
-                            <v-row>
                                 <v-col>
                                     <v-text-field :model-value="selectedItem.fabricante"
                                         @update:model-value="(val) => inEdit.fabricante = val" label="Fabricante"
@@ -171,6 +171,7 @@ const { xs } = useDisplay();
 const isMobile = computed(() => xs.value);
 
 const headers = [
+    { title: 'Tipo', key: 'tipo', sortable: false },
     { title: 'Fabricante', key: 'fabricante', sortable: false },
     { title: 'Modelo', key: 'modelo', sortable: false },
     { title: 'Path RTSP', key: 'path_rtsp', sortable: false },
@@ -189,12 +190,37 @@ const dialogEdit = ref(false)
 const dialogDelete = ref(false)
 const inEdit = ref({})
 const alerts = ref({ alertEdit: { status: false, type: '', message: "" } })
-const deviceInfo = ref({ fabricante: '', modelo: '', path_rtsp: '', versao: '' })
+const deviceInfo = ref({ tipo: '', fabricante: '', modelo: '', path_rtsp: '', versao: '' })
 const auxPage = ref(1)
 const auxItemsPerPage = ref(5)
 
+// mapeando para nomes mais amigaveis
+const typeMapping = {
+    ip_cam: "Câmera IP",
+    dvr: "DVR",
+    nvr: "NVR"
+};
 
 
+// devices types
+const deviceTypes = [
+    { label: "Selecione um tipo...", value: "", disabled: true },
+    { label: 'Câmera IP', value: 'ip_cam' },
+    { label: 'DVR', value: 'dvr' },
+    { label: 'NVR', value: 'nvr' },
+]
+
+
+// Computed para verificar se todos os campos estão preenchidos
+const isFormValid = computed(() => {
+    return (
+        deviceInfo.value.tipo !== "" &&
+        deviceInfo.value.fabricante.trim() !== "" &&
+        deviceInfo.value.modelo.trim() !== "" &&
+        deviceInfo.value.path_rtsp.trim() !== "" &&
+        deviceInfo.value.versao.trim() !== ""
+    );
+});
 
 
 // dialogos de edição e exclusão
@@ -212,8 +238,8 @@ const openDeleteDialog = (item) => {
 
 // add device
 const addDevice = async (item) => {
-    const { fabricante, modelo, path_rtsp, versao } = item
-    const data = { fabricante, modelo, path_rtsp, versao }
+    const { tipo, fabricante, modelo, path_rtsp, versao } = item
+    const data = { tipo, fabricante, modelo, path_rtsp, versao }
     alerts.value.alertEdit.status = false
     await storeManageDevice.createDeviceInfo(data).then((response) => {
         console.log(response)
@@ -221,13 +247,14 @@ const addDevice = async (item) => {
             alerts.value.alertEdit.status = true
             alerts.value.alertEdit.type = 'success'
             alerts.value.alertEdit.message = 'Dispositivo adicionado com sucesso!'
+            deviceInfo.value = { tipo: '', fabricante: '', modelo: '', path_rtsp: '', versao: '' }
         } else {
             alerts.value.alertEdit.status = true
             alerts.value.alertEdit.type = 'error'
             alerts.value.alertEdit.message = 'Erro ao adicionar dispositivo!'
         }
         dialogNewDevice.value = false
-        loadItems({ auxPage, auxItemsPerPage})
+        loadItems({ auxPage, auxItemsPerPage })
     }).catch((error) => {
         alerts.value.alertEdit.status = true
         alerts.value.alertEdit.type = 'error'
@@ -254,7 +281,7 @@ const editDevice = async (item) => {
             alerts.value.alertEdit.message = 'Erro ao editar dispositivo!'
         }
         dialogEdit.value = false
-        loadItems({ auxPage, auxItemsPerPage})
+        loadItems({ auxPage, auxItemsPerPage })
     }).catch((error) => {
         alerts.value.alertEdit.status = true
         alerts.value.alertEdit.type = 'error'
@@ -278,7 +305,7 @@ const deleteDevice = async (id) => {
             alerts.value.alertEdit.message = 'Erro ao deletar dispositivo!'
         }
         dialogDelete.value = false
-        loadItems({ auxPage, auxItemsPerPage})
+        loadItems({ auxPage, auxItemsPerPage })
     }).catch((error) => {
         alerts.value.alertEdit.status = true
         alerts.value.alertEdit.type = 'error'
@@ -293,12 +320,12 @@ const loadItems = async ({ page = auxPage.value, itemsPerPage = auxItemsPerPage.
     auxPage.value = page
     auxItemsPerPage.value = itemsPerPage
     loading.value = true
-    const dataShowInTable = [ 'id','fabricante', 'modelo', 'path_rtsp', 'versao']
+    const dataShowInTable = ['id', 'tipo', 'fabricante', 'modelo', 'path_rtsp', 'versao']
     await storeManageDevice.searchDeviceInfoAll().then((res) => {
         console.log(res.data)
         const dataFilter = res.data.map((item) => {
             return dataShowInTable.reduce((acc, key) => {
-                acc[key] = item[key];
+                acc[key] = key === "tipo" ? typeMapping[item[key]] || item[key] : item[key];
                 return acc;
             }, {});
         });

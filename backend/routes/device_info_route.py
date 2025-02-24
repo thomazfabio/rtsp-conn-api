@@ -26,3 +26,9 @@ def get_all():
 def get_by_id():
     id = request.args.get('id')
     return device_info_controller.get_by_id(id)
+
+@device_info_bp.route('/get_by_type', methods=['GET'])
+def get_by_type():
+    tipo = request.args.get('device_tipo')
+    return device_info_controller.get_by_type(tipo)
+

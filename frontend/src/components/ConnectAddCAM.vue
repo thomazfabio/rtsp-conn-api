@@ -1,11 +1,11 @@
 <template>
-  <v-stepper  hide-actions ref="stepper" :items="['Passo 1', 'Passo 2', 'Passo 3', 'Passo 4']" v-model="step">
+  <v-stepper :mobile="isMobile"  hide-actions ref="stepper" :items="['Passo 1', 'Passo 2', 'Passo 3', 'Passo 4']" v-model="step">
     <template v-slot:item.1>
-      <v-card title="Selecione o tipo de dispositivo:" flat>
+      <v-card title="Tipo de dispositivo" flat>
         <v-row>
           <v-container>
-            <v-col cols="6">
-              <v-select label="Selecione o tipo de dispositivo que deseja conectar"
+            <v-col cols="12" lg="6" md="6" sm="8">
+              <v-select label="Selecione o tipo"
                 :items="['DVR', 'Camera IP', 'URL da Web']" variant="outlined" v-model="selectedDeviceType"></v-select>
             </v-col>
           </v-container>
@@ -197,8 +197,12 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useCamUrlMenageStore } from "../stores/utils/camUrlMenage";
 import { useCreateCamFullDataStore } from "../stores/deviceManage/createCamFullData";
 import camSimpleVisualizer from "./camVizualizer/camSimpleVisualizer.vue";
+import { useDisplay } from "vuetify";
+
 const storeCamUrlMenage = useCamUrlMenageStore();
 const storeCreateCamFullData = useCreateCamFullDataStore();
+const { xs } = useDisplay();
+const isMobile = computed(() => xs.value);
 
 const disabledControl = computed(() => {
   if (step.value === 1 && selectedDeviceType.value === null) return true; // Desabilita o botão "Anterior" no primeiro passo

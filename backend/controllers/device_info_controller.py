@@ -2,29 +2,33 @@ from flask import jsonify
 from model import device_info_model
 from database import db
 
+
 def create(data):
 
     try:
         new_device_info = device_info_model.DeviceInfo(
-            fabricante = data["fabricante"],
-            modelo = data["modelo"],
-            path_rtsp = data["path_rtsp"],
-            versao = data["versao"]
-            
+            tipo=data["tipo"],
+            fabricante=data["fabricante"],
+            modelo=data["modelo"],
+            path_rtsp=data["path_rtsp"],
+            versao=data["versao"],
         )
         db.session.add(new_device_info)
         db.session.commit()
         return jsonify({"message": "Device info created successfully!"}), 201
     except Exception as e:
         return jsonify({"message": f"Error creating device info: {e}"}), 500
-    
+
+
+# Funções para retornar registros (GET)
 def get_all():
     try:
         device_info = device_info_model.DeviceInfo.query.all()
         return jsonify([device_info.serialize() for device_info in device_info])
     except Exception as e:
         return jsonify({"message": f"Error getting device info: {e}"}), 500
-    
+
+
 def get_by_id(id):
     try:
         device_info = device_info_model.DeviceInfo.query.get(id)
@@ -33,7 +37,30 @@ def get_by_id(id):
         return jsonify({"message": "Device info not found"}), 404
     except Exception as e:
         return jsonify({"message": f"Error getting device info: {e}"}), 500
-    
+
+
+def get_by_type(tipo):
+    try:
+        device_info = device_info_model.DeviceInfo.query.filter_by(tipo=tipo).all()
+        if device_info:
+            return jsonify([device_info.serialize() for device_info in device_info])
+        return jsonify({"message": "Device info not found"}), 404
+    except Exception as e:
+        return jsonify({"message": f"Error getting device info: {e}"}), 500
+
+
+def get_by_fabricante(fabricante):
+    try:
+        device_info = device_info_model.DeviceInfo.query.filter_by(
+            fabricante=fabricante
+        ).all()
+        if device_info:
+            return jsonify([device_info.serialize() for device_info in device_info])
+        return jsonify({"message": "Device info not found"}), 404
+    except Exception as e:
+        return jsonify({"message": f"Error getting device info: {e}"}), 500
+
+
 def update(data):
     try:
         device_info = device_info_model.DeviceInfo.query.get(data["id"])
@@ -47,7 +74,8 @@ def update(data):
         return jsonify({"message": "Device info not found"}), 404
     except Exception as e:
         return jsonify({"message": f"Error updating device info: {e}"}), 500
-    
+
+
 def delete(id):
     try:
         device_info = device_info_model.DeviceInfo.query.get(id)
@@ -58,4 +86,3 @@ def delete(id):
         return jsonify({"message": "Device info not found"}), 404
     except Exception as e:
         return jsonify({"message": f"Error deleting device info: {e}"}), 500
-    

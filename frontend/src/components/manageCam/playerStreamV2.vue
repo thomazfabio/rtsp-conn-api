@@ -1,19 +1,20 @@
 <template>
-    <v-container class="pb-0 mb-0">
+    <v-container class="mb-0 pb-0">
         <v-img :src="url" contain class="w-100 h-100" />
     </v-container>
     <!-- controles do stream -->
     <v-container class="pt-0 mt-0">
-        <v-row class="d-flex justify-center">
-            <v-col cols="4"> <v-btn color="green" prepend-icon="mdi-play"  size="small" variant="text">play</v-btn>
-            </v-col>
-            <v-col cols="4" class="d-flex justify-center"> <v-btn color="red" prepend-icon="mdi-stop"  size="small" variant="text">stop</v-btn>
-            </v-col>
-            <v-col cols="4" class="d-flex justify-end"> <v-btn color="blue" prepend-icon="mdi-refresh"  size="small" variant="text">refresh</v-btn>
-            </v-col>
-        </v-row>
+        
+            <v-sheet color="blue-grey-darken-4" class="d-flex justify-center">
+                <v-btn color="green" prepend-icon="mdi-play" size="x-small" stacked variant="plain"></v-btn>
+
+                <v-btn color="red" prepend-icon="mdi-stop" size="x-small" stacked variant="plain"></v-btn>
+
+                <v-btn color="blue" prepend-icon="mdi-refresh" size="x-small" stacked variant="plain"></v-btn>
+            </v-sheet>
+        
     </v-container>
-    <v-divider /> 
+    <v-divider />
 </template>
 
 <script setup>

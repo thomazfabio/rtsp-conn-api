@@ -40,6 +40,17 @@ export const useManageDeviceInfoStore = defineStore("manage-device-info", () => 
         }
     }
 
+    async function searchDeviceInfoByTip(device_tipo) {
+        const endpoint = "device_info/list_by_type";
+        try {
+            const response = await api.get(endpoint, { params: { device_tipo: device_tipo } });
+            return response;
+        } catch (error) {
+            console.error("Erro na requisição:", error);
+            throw error;
+        }
+    }
+
     async function deleteDeviceInfoById(device_id) {
         const endpoint = "device_info/delete";
         try {
