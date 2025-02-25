@@ -415,6 +415,9 @@ watch([selectedManufacturer, selectedModel], ([newManufacturer, newModel]) => {
 
     // Atualiza o path dinamicamente
     deviceFullInfo.value.path = foundDevice ? foundDevice.path_rtsp : "";
+
+    // atualiza camData deviceid
+    camData.value.deviceId = foundDevice ? foundDevice.id : null;
   }
 });
 
@@ -493,6 +496,7 @@ function urlReady(url) {
 
 // chamadas na store para salvar dados
 const saveCamData = async () => {
+  console.log(camData.value.deviceId);
   const device =
   {
     "channel": deviceFullInfo.value.channel,
@@ -507,7 +511,7 @@ const saveCamData = async () => {
 
   const fullCamData = {
     "user_id": "1",
-    "device_id": "1",
+    "device_id": camData.value.deviceId,
     "cam_name": camData.value.camName,
     "grupo": camData.value.grupo,
     "full_cam_url_stream": urlStreamReady.value,
@@ -515,14 +519,14 @@ const saveCamData = async () => {
     "cam_status": "online",
     "device_config": device
   };
- console.log(fullCamData);
+
   loading.value.await_status_save_cam = true;
   alerts.value.alert_save_cam.status = false;
   try {
     const response = await storeCreateCamFullData.createCamFullData(fullCamData);
     loading.value.await_status_save_cam = false;
-    console.log(response);
-    console.log("Dados da câmera salvo com sucesso componente ConnectAddCAM.vue");
+    
+   
     alerts.value.alert_save_cam.status = true;
     alerts.value.alert_save_cam.type = "success";
     alerts.value.alert_save_cam.msg = "Dados da câmera salvo com sucesso!";
