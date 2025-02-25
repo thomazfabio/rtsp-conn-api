@@ -6,11 +6,11 @@
     <v-container class="pt-0 mt-0">
         
             <v-sheet color="blue-grey-darken-4" class="d-flex justify-center">
-                <v-btn color="green" prepend-icon="mdi-play" size="x-small" stacked variant="plain"></v-btn>
+                <v-btn class="pa-0" color="green" prepend-icon="mdi-play-speed" height="50" stacked variant="plain"></v-btn>
 
-                <v-btn color="red" prepend-icon="mdi-stop" size="x-small" stacked variant="plain"></v-btn>
+                <v-btn class="pa-0" color="red" prepend-icon="mdi-stop-circle-outline" height="50" stacked variant="plain"></v-btn>
 
-                <v-btn color="blue" prepend-icon="mdi-refresh" size="x-small" stacked variant="plain"></v-btn>
+                <v-btn class="pa-0" color="blue" prepend-icon="mdi-refresh"height="50" stacked variant="plain"></v-btn>
             </v-sheet>
         
     </v-container>

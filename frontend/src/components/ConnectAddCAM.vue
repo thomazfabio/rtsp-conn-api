@@ -15,12 +15,13 @@
     </template>
 
     <template v-slot:item.2>
-      <v-card title="Detalhes de Conexão" flat>
+      <v-card>
+        <v-card-title class="pr-0 pl-0">Detalhes da conexão</v-card-title>
         <v-form>
           <template v-if="selectedDeviceType === 'DVR'">
-            <v-card-subtitle>Informações do DVR</v-card-subtitle>
+            <v-card-subtitle class="pr-0 pl-0">Informações do DVR</v-card-subtitle>
             <v-divider class="mt-3 mb-3" />
-            <v-container>
+            <v-container class="pr-0 pl-0" fluid>
               <!-- Configurações para DVR -->
               <v-row>
                 <v-col class="d-flex align-center" cols="auto">
@@ -78,9 +79,57 @@
           </template>
           <template v-else-if="selectedDeviceType === 'Camera IP'">
             <!-- Configurações para Câmera IP -->
-            <v-text-field label="URL da Câmera IP"></v-text-field>
-            <v-text-field></v-text-field>
-            <v-text-field></v-text-field>
+            <v-divider class="mt-1 mb-8" />
+            <v-row>
+              <v-col cols="12" lg="12" class="pb-0 pt-0 mt-0 mb-0">
+                <v-row>
+                  <v-checkbox class="pl-1 mr-5" v-model="protocolCkeckBox" label="RTSP" value="RTSP"
+                    color="info"></v-checkbox>
+                  <v-checkbox class="pl-1" v-model="preferedStream" label="Stream extra " color="info"></v-checkbox>
+                </v-row>
+              </v-col>
+
+              <v-col cols="12" xl="4" lg="4" md="4" sm="8">
+                <v-select v-model="selectedManufacturer" :items="manufacturers" label="Fabricante" variant="outlined"
+                  density="compact" @update:model-value="updateFabricante"></v-select>
+              </v-col>
+
+              <v-col cols="12" xl="4" lg="4" md="4" sm="8">
+                <v-select v-model="selectedModel" :items="models" label="Modelo" variant="outlined" density="compact"
+                  :disabled="!selectedManufacturer" @update:model-value="updateModelo"></v-select>
+              </v-col>
+
+
+              <v-col cols="12" xl="4" lg="4" md="4" sm="8">
+                <v-text-field v-model="deviceFullInfo.ip" label="IP ou URL da Câmera" variant="outlined"
+                  density="compact"></v-text-field>
+              </v-col>
+
+              <v-col cols="12" xl="4" lg="4" md="4" sm="8">
+                <v-text-field v-model="deviceFullInfo.path" label="Path" variant="outlined" density="compact"
+                  :disabled="true"></v-text-field>
+              </v-col>
+
+              <v-col cols="12" xl="4" lg="4" md="4" sm="8">
+                <v-text-field v-model="deviceFullInfo.porta" label="Porta" variant="outlined"
+                  density="compact"></v-text-field>
+              </v-col>
+              <v-col cols="12" xl="4" lg="4" md="4" sm="8">
+                <v-text-field v-model="deviceFullInfo.channel" label="Numero do canal" variant="outlined"
+                  density="compact"></v-text-field>
+              </v-col>
+
+              <v-col cols="12" xl="4" lg="4" md="4" sm="8">
+                <v-text-field v-model="deviceFullInfo.user" label="Usuario" variant="outlined"
+                  density="compact"></v-text-field>
+              </v-col>
+
+              <v-col cols="12" xl="4" lg="4" md="4" sm="8">
+                <v-text-field v-model="deviceFullInfo.pass" label="Senha" variant="outlined"
+                  density="compact"></v-text-field>
+              </v-col>
+
+            </v-row>
           </template>
           <template v-else-if="selectedDeviceType === 'URL da Web'">
             <!-- Configurações para NVR -->
@@ -96,14 +145,15 @@
     </template>
 
     <template v-slot:item.3>
-      <v-alert v-if="alerts.alert_teste_url.status" :type="alerts.alert_teste_url.type" variant="outlined" closable
+      <v-alert class="mb-1" v-if="alerts.alert_teste_url.status" :type="alerts.alert_teste_url.type" variant="outlined" closable
         dismissible>
         {{ alerts.alert_teste_url.msg }}
       </v-alert>
-      <v-card :loading="loading.await_status_url" :disabled="loading.await_status_url" title="Verificação da URL" flat>
+      <v-card :loading="loading.await_status_url" :disabled="loading.await_status_url">
+        <v-card-title class="pr-0 pl-0">Teste a URL</v-card-title>
         <v-divider />
-        <v-card-text>Essa é sua URL:</v-card-text>
-        <v-container>
+        <v-card-text class="pr-0 pl-0">Essa é sua URL:</v-card-text>
+        <v-container class="pr-0 pl-0">
           <v-row class="mb-4">
             <v-col>
               <span class="text-primary font-weight-bold">{{ fullUrl }}</span>
@@ -131,18 +181,13 @@
         dismissible>
         {{ alerts.alert_save_cam.msg }}
       </v-alert>
-      <v-card :loading="loading.await_status_save_cam" :disabled="loading.await_status_save_cam"
-        title="Finalize e salve as configurações" flat>
-        <v-container>
+      <v-card :loading="loading.await_status_save_cam" :disabled="loading.await_status_save_cam">
+        <v-card-title class="pr-0 pl-0">Finalize a configuração</v-card-title>
+        <v-container class="pr-0 pl-0">
           <v-row>
-            <v-col cols="auto">
-              <span>Sua URL: </span>
-            </v-col>
             <v-col>
-              <span class="text-primary font-weight-bold" v-if="
-                selectedDeviceType === 'DVR' &&
-                deviceFullInfo.fabricante === 'Intelbras'
-              ">{{ fullUrl }}</span>
+              <span class="font-weight-bold">URL :  </span>
+              <span class="text-primary font-weight-bold"> {{ fullUrl }}</span>
             </v-col>
           </v-row>
           <v-row>
@@ -265,6 +310,14 @@ watch(selectedDeviceType, async (newVal) => {
     console.log("Camera IP selecionada");
     const device = await storeManageDeviceInfo.searchDeviceInfoByType("ip_cam").then((res) => {
       console.log(res.data);
+      // Armazena todos os dispositivos retornados
+      allDevices.value = res.data;
+
+      // Extrai os fabricantes e remove duplicatas
+      const uniqueManufacturers = [...new Set(res.data.map(item => item.fabricante))];
+
+      // Atualiza a variável reativa
+      manufacturers.value = uniqueManufacturers;
     }).catch((err) => {
       console.error(err);
     });
@@ -462,7 +515,7 @@ const saveCamData = async () => {
     "cam_status": "online",
     "device_config": device
   };
-
+ console.log(fullCamData);
   loading.value.await_status_save_cam = true;
   alerts.value.alert_save_cam.status = false;
   try {
