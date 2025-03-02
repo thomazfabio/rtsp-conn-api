@@ -7,7 +7,9 @@ const api = api_url_rtsp;
 export const useVisualizerCamV2Store = defineStore("control-stream", () => {
   async function startStream(camUrl) {
     const url = { url: camUrl };
-    const endpoint = "visualizer_cam_v2/start_stream"; 
+    console.log(url.url)
+
+    const endpoint = "visualizer_cam_v2/start_stream";
     const response = await api.post(endpoint, { url: url.url });
 
     console.log(response.status)
@@ -16,9 +18,10 @@ export const useVisualizerCamV2Store = defineStore("control-stream", () => {
 
   async function stopStream(camUrl) {
     const url = { url: camUrl };
+    console.log(url.url)
     const endpoint = "visualizer_cam_v2/stop_stream";
     const response = await api.post(endpoint, { url: url.url });
- 
+
     console.log(response.status)
     return response;
   }

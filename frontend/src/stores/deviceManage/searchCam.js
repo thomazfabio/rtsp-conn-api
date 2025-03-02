@@ -6,9 +6,11 @@ export const useSearchCamStore = defineStore("search-cam", () => {
     async function searchCamByUserId(user_id) {
         const id = user_id.user_id;
         const endpoint = "manage_cam_device/list_by_user_id";
-
+        console.log("Buscando dados...");
+        console.log("ID do usuário:", id);
         try {
             const response = await api.get(endpoint, { params: { user_id: id } });
+            console.log("Dados recebidos:", response);
             return response;  // Agora realmente retorna os dados
         } catch (error) {
             console.error("Erro na requisição:", error);

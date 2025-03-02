@@ -2,9 +2,10 @@
   <v-stepper :mobile="isMobile" hide-actions ref="stepper" :items="['Passo 1', 'Passo 2', 'Passo 3', 'Passo 4']"
     v-model="step">
     <template v-slot:item.1>
-      <v-card title="Tipo de dispositivo" flat>
+      <v-card >
+        <v-card-title class="pr-0 pl-0">Selecione o tipo de dispositivo</v-card-title>
         <v-row>
-          <v-container>
+          <v-container class="pr-0 pl-0">
             <v-col cols="12" lg="6" md="6" sm="8">
               <v-select label="Selecione o tipo" :items="['DVR', 'Camera IP', 'URL da Web']" variant="outlined"
                 v-model="selectedDeviceType"></v-select>
@@ -177,7 +178,7 @@
     </template>
 
     <template v-slot:item.4>
-      <v-alert v-if="alerts.alert_save_cam.status" :type="alerts.alert_save_cam.type" variant="outlined" closable
+      <v-alert class="mb-1" v-if="alerts.alert_save_cam.status" :type="alerts.alert_save_cam.type" variant="outlined" closable
         dismissible>
         {{ alerts.alert_save_cam.msg }}
       </v-alert>
@@ -515,7 +516,7 @@ const saveCamData = async () => {
     "cam_name": camData.value.camName,
     "grupo": camData.value.grupo,
     "full_cam_url_stream": urlStreamReady.value,
-    "ful_cam_url_rtsp": fullUrl.value,
+    "full_cam_url_rtsp": fullUrl.value,
     "cam_status": "online",
     "device_config": device
   };
