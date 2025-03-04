@@ -61,7 +61,7 @@ class VideoStream:
 
 
     def _read_frames(self):
-        target_fps = 9  # FPS desejado
+        target_fps = 30  # FPS desejado
         frame_time = 1.0 / target_fps  # Tempo ideal entre frames
 
         while self.running:
@@ -87,7 +87,7 @@ class VideoStream:
 
             if ret:
                 frame = cv2.resize(frame, (480, 360))
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 
                 
                 ret, buffer = cv2.imencode(
@@ -175,7 +175,7 @@ def stream_video():
         )
 
     def generate():
-        fps_limit = 9  # Limitar a 10 frames por segundo (ajustável)
+        fps_limit = 30  # Limitar a 10 frames por segundo (ajustável)
         frame_interval = 1 / fps_limit
         last_frame_time = time.time()
 

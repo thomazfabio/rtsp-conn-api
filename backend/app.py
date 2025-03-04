@@ -21,7 +21,7 @@ CORS(app)  # Configura o CORS para todas as rotas
 
 # configure the MariaDb database
 app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "mariadb+mariadbconnector://fabio:root@127.0.0.1:3306/rtsp_conn_api"
+    "mariadb+mariadbconnector://fabio:227802@127.0.0.1:3306/rtsp_conn_api"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
