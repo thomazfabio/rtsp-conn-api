@@ -1,6 +1,5 @@
 import asyncio
 import websockets
-import numpy as np
 
 # Variáveis de configuração
 SERVER_URL = "ws://localhost:8765"  # URL do servidor de inferência WebSocket (ajuste conforme necessário)

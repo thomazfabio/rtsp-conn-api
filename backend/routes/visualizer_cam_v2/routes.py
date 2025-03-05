@@ -4,7 +4,7 @@ import threading
 import time
 from collections import deque
 from . import visualizer_cam_v2
-
+from ws.ws import send_frame
 # Gerenciamento de streams ativos
 
 
@@ -61,7 +61,7 @@ class VideoStream:
 
 
     def _read_frames(self):
-        target_fps = 30  # FPS desejado
+        target_fps = 20  # FPS desejado
         frame_time = 1.0 / target_fps  # Tempo ideal entre frames
 
         while self.running:
@@ -86,18 +86,25 @@ class VideoStream:
                         break
 
             if ret:
-                frame = cv2.resize(frame, (480, 360))
+                frame = cv2.resize(frame, (640, 480))
                 #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                # Tipo do frame (normalmente será numpy.ndarray se for uma imagem do OpenCV)
                 
+
                 
+                # Codifica o frame em JPEG
+
+               
                 ret, buffer = cv2.imencode(
                     ".jpg",
                     frame,
-                    [cv2.IMWRITE_JPEG_QUALITY, 60],
+                    [cv2.IMWRITE_JPEG_QUALITY, 80],
                 )
+               
+                
                 if ret:
                     self.buffer.append(buffer.tobytes())
-
+                    
             # Garante que respeitamos o FPS
             elapsed_time = time.time() - start_time
             sleep_time = max(0, frame_time - elapsed_time)
@@ -175,7 +182,7 @@ def stream_video():
         )
 
     def generate():
-        fps_limit = 30  # Limitar a 10 frames por segundo (ajustável)
+        fps_limit = 20  # Limitar a 10 frames por segundo (ajustável)
         frame_interval = 1 / fps_limit
         last_frame_time = time.time()
 
