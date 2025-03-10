@@ -1,8 +1,10 @@
 import asyncio
-import websockets
+import websockets   
+import cv2
+import numpy as np
 
 # Variáveis de configuração
-SERVER_URL = "ws://localhost:8765"  # URL do servidor de inferência WebSocket (ajuste conforme necessário)
+SERVER_URL = "ws://192.168.15.155:8765"  # URL do servidor de inferência WebSocket (ajuste conforme necessário)
 
 # Função para iniciar a conexão WebSocket
 async def connect_to_inference_server():
@@ -30,3 +32,6 @@ async def send_frame_to_inference_server(frame):
 # Função para ser chamada em outro arquivo que passará o frame
 def send_frame(frame):
     asyncio.run(send_frame_to_inference_server(frame))
+
+   
+    

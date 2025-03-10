@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, Response
 import cv2
 import threading
+import asyncio
 import time
 from collections import deque
 from . import visualizer_cam_v2
@@ -61,7 +62,7 @@ class VideoStream:
 
 
     def _read_frames(self):
-        target_fps = 20  # FPS desejado
+        target_fps = 15  # FPS desejado
         frame_time = 1.0 / target_fps  # Tempo ideal entre frames
 
         while self.running:
@@ -98,8 +99,9 @@ class VideoStream:
                 ret, buffer = cv2.imencode(
                     ".jpg",
                     frame,
-                    [cv2.IMWRITE_JPEG_QUALITY, 80],
+                    [cv2.IMWRITE_JPEG_QUALITY,70],
                 )
+               
                
                 
                 if ret:
@@ -182,7 +184,7 @@ def stream_video():
         )
 
     def generate():
-        fps_limit = 20  # Limitar a 10 frames por segundo (ajustável)
+        fps_limit = 15  # Limitar a 10 frames por segundo (ajustável)
         frame_interval = 1 / fps_limit
         last_frame_time = time.time()
 
