@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streaming de Vídeo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
+</head>
+
+<body>
+    <h1>Streaming de Vídeo</h1>
+    <img id="videoStream" width="640" height="480" alt="Streaming de vídeo">
+    <br>
+    <hr>
+    <img id="videoStream2" width="640" height="480" alt="Streaming de vídeo">
+    <hr>
+    <img id="videoStream3" width="640" height="480" alt="Streaming de vídeo">
+    <script>
+        const socket = io("http://127.0.0.1:5000", { transports: ["websocket"] });
+        const streamId = 1; // ID da stream
+
+        function startStream() {
+            socket.emit("start_stream", { id: streamId, url: "URL_DO_VIDEO", width: 640, height: 480, fps: 10 });
+        }
+
+        function stopStream() {
+            socket.emit("stop_stream", { id: streamId });
+        }
+
+        socket.on(`frame_${streamId}`, (data) => {
+            const img = document.getElementById("videoStream");
+            img.src = "data:image/jpeg;base64," + arrayBufferToBase64(data);
+        });
+
+        socket.on(`frame_2`, (data) => {
+            const img = document.getElementById("videoStream2");
+            img.src = "data:image/jpeg;base64," + arrayBufferToBase64(data);
+        });
+        socket.on(`frame_3`, (data) => {
+            const img = document.getElementById("videoStream3");
+            img.src = "data:image/jpeg;base64," + arrayBufferToBase64(data);
+        });
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+    </script>
+</body>
+
+</html>

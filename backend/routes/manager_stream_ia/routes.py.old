@@ -1,0 +1,113 @@
+import cv2
+import time
+import asyncio
+import threading
+from collections import deque
+from flask import Blueprint
+from flask_socketio import SocketIO, emit
+
+# Configuração do Flask e WebSocket
+socketio = SocketIO()
+streaming_ia_bp = Blueprint("streaming", __name__)
+
+class VideoStream:
+    def __init__(self, stream_id, url, width, height, fps):
+        self.stream_id = stream_id
+        self.url = url
+        self.width = width
+        self.height = height
+        self.fps = fps
+        self.running = False
+        self.capture = None
+        self.latest_frame = None  # Último frame armazenado
+
+    def initialize(self):
+        self.capture = cv2.VideoCapture(self.url)
+        if not self.capture or not self.capture.isOpened():
+            print(f"Erro ao abrir a stream {self.stream_id}")
+            return False
+
+        self.running = True
+        threading.Thread(target=self._start_async_loop, daemon=True).start()
+        return True
+
+    def stop(self):
+        self.running = False
+        if self.capture:
+            self.capture.release()
+            self.capture = None
+        self.latest_frame = None
+
+    def _start_async_loop(self):
+        asyncio.run(self._read_frames())
+
+    async def _read_frames(self):
+        frame_time = 1.0 / self.fps
+
+        while self.running:
+            start_time = time.time()
+
+            ret, frame = self.capture.read()
+            if not ret:
+                print(f"Falha ao capturar frame da stream {self.stream_id}")
+                await self._reconnect()
+                continue
+
+            frame = cv2.resize(frame, (self.width, self.height))
+            ret, buffer = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, 50])
+            if ret:
+                self.latest_frame = buffer.tobytes()
+                socketio.emit(f"frame_{self.stream_id}", self.latest_frame)
+                print(f"Frame enviado para stream {self.stream_id}")
+
+            elapsed_time = time.time() - start_time
+            sleep_time = max(0, frame_time - elapsed_time)
+            await asyncio.sleep(sleep_time)
+
+    async def _reconnect(self):
+        self.capture.release()
+        await asyncio.sleep(2)  # Espera antes de tentar reconectar
+        self.capture = cv2.VideoCapture(self.url)
+        if self.capture.isOpened():
+            print(f"Reconectado ao stream {self.stream_id}")
+        else:
+            print(f"Falha ao reconectar ao stream {self.stream_id}")
+
+class StreamManager:
+    def __init__(self):
+        self.streams = {}
+
+    def start_stream(self, stream_id, url, width, height, fps):
+        if stream_id in self.streams:
+            return False, "Stream já em execução"
+
+        stream = VideoStream(stream_id, url, width, height, fps)
+        if stream.initialize():
+            self.streams[stream_id] = stream
+            return True, "Stream iniciada com sucesso"
+        return False, "Falha ao iniciar a stream"
+
+    def stop_stream(self, stream_id):
+        if stream_id in self.streams:
+            self.streams[stream_id].stop()
+            del self.streams[stream_id]
+            return True, "Stream encerrada"
+        return False, "Stream não encontrada"
+
+stream_manager = StreamManager()
+
+@socketio.on("start_stream")
+def handle_start_stream(data):
+    success, message = stream_manager.start_stream(
+        data["id"], data["url"], data["width"], data["height"], data["fps"]
+    )
+    emit("start_response", {"success": success, "message": message})
+
+@socketio.on("stop_stream")
+def handle_stop_stream(data):
+    success, message = stream_manager.stop_stream(data["id"])
+    emit("stop_response", {"success": success, "message": message})
+
+@streaming_ia_bp.route("/teste")
+def teste():
+    return "Teste"

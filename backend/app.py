@@ -4,6 +4,7 @@ from database import db
 from routes.url_rtsp import url_rtsp
 from routes.visualizer_cam import visualizer_cam
 from routes.visualizer_cam_v2 import visualizer_cam_v2
+from routes.manager_stream_ia.routes import streaming_ia_bp, socketio
 
 from routes import manage_cam_device_route, device_info_route
 from flask_cors import CORS
@@ -16,9 +17,19 @@ from routes.url_rtsp.models import UrlRtsp
 
 app = Flask(__name__)
 
-CORS(app)  # Configura o CORS para todas as rotas
 
+# Configura CORS para permitir conexões WebSocket
+CORS(app)
 
+# Registra o Blueprint com o prefixo que usam websocket
+app.register_blueprint(streaming_ia_bp, url_prefix="/streaming_ia")
+
+socketio.init_app(app, cors_allowed_origins="*")
+
+if __name__ == "__main__":
+    socketio.run(app, host="localhost", port=5000, debug=True, cors_allowed_origins="*")
+
+    
 # configure the MariaDb database
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     "mariadb+mariadbconnector://fabio:root@127.0.0.1:3306/rtsp_conn_api"
@@ -45,6 +56,9 @@ def test_db_connection():
 
 
 test_db_connection()
+
+
+
 
 # Criação das tabelas (todas as tabelas definidas nos modelos)
 with app.app_context():

@@ -15,4 +15,4 @@
 }'''
 
 # exemplo de url completa dvr intelbras hdcvi 1004 g2
-rtsp://admin:227802@192.168.15.151:554/cam/realmonitor?channel=4&subtype=1
+rtsp://admin:227802@192.168.15.150:554/cam/realmonitor?channel=4&subtype=0
