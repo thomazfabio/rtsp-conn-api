@@ -19,6 +19,9 @@
     <script>
         const socket = io("http://127.0.0.1:5000", { transports: ["websocket"] });
         const streamId = 1; // ID da stream
+        // Variável para evitar chamadas excessivas
+        let lastSubscriptionTime = 0;
+        const subscriptionInterval = 5000; // 5 segundos
 
         function startStream() {
             socket.emit("start_stream", { id: streamId, url: "URL_DO_VIDEO", width: 640, height: 480, fps: 10 });
@@ -39,7 +42,13 @@
         });
         socket.on(`frame_3`, (data) => {
             const img = document.getElementById("videoStream3");
+
             img.src = "data:image/jpeg;base64," + arrayBufferToBase64(data);
+            const now = Date.now();
+            if (now - lastSubscriptionTime > subscriptionInterval) {
+                socket.emit("subscribe_stream", { id: 3 });
+                lastSubscriptionTime = now;
+            }
         });
         function arrayBufferToBase64(buffer) {
             let binary = '';
@@ -50,6 +59,19 @@
             }
             return btoa(binary);
         }
+
+        socket.on("connect", () => {
+            console.log("Conectado ao servidor");
+        });
+
+        socket.on("disconnect", () => {
+            console.log("Desconectado do servidor");
+        });
+
+        // Fechar o socket antes de sair da página
+        window.addEventListener("beforeunload", () => {
+            socket.disconnect();
+        });
     </script>
 </body>
 

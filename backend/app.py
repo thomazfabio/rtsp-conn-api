@@ -1,3 +1,5 @@
+import eventlet
+eventlet.monkey_patch() 
 from flask import Flask
 from sqlalchemy import text  # Importa text para criar consultas SQL
 from database import db
@@ -27,8 +29,15 @@ app.register_blueprint(streaming_ia_bp, url_prefix="/streaming_ia")
 socketio.init_app(app, cors_allowed_origins="*")
 
 if __name__ == "__main__":
-    socketio.run(app, host="localhost", port=5000, debug=True, cors_allowed_origins="*")
+    socketio.run(app, host="localhost", port=5000, debug=True)
 
+@socketio.on("connect")
+def handle_connect():
+    print("Cliente conectado")
+
+@socketio.on("disconnect")
+def handle_disconnect():
+    print("Cliente desconectado")
     
 # configure the MariaDb database
 app.config["SQLALCHEMY_DATABASE_URI"] = (

@@ -70,6 +70,10 @@ class VideoStream:
         self.thread = threading.Thread(target=self._start_async_loop, daemon=True)
         self.thread.start()
 
+        # Iniciar a thread de monitoramento de inatividade
+        self.monitor_thread = threading.Thread(target=self._monitor_inatividade, daemon=True)
+        self.monitor_thread.start()
+
         return True
 
     def _start_async_loop(self):
@@ -114,7 +118,15 @@ class VideoStream:
         finally:
             print(f"Encerrando loop de leitura da stream {self.stream_id}.")
 
-    
+    # Adiciona um método para monitorar a inatividade do stream
+    def _monitor_inatividade(self):
+        """Monitora a inatividade do stream e encerra se não for permanente."""
+        while self.running:
+            if not self.permanente and time.time() - self.last_viewer_time > 10:
+                print(f"Encerrando stream {self.stream_id} por inatividade.")
+                stream_manager.stop_stream(self.stream_id)
+                break
+            time.sleep(5)  # Verifica a cada 5 segundos
 
 
 
