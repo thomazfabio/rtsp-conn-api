@@ -1,88 +1,54 @@
-import eventlet
-eventlet.monkey_patch() 
+
 from flask import Flask
 from sqlalchemy import text  # Importa text para criar consultas SQL
 from database import db
 from routes.url_rtsp import url_rtsp
 from routes.visualizer_cam import visualizer_cam
 from routes.visualizer_cam_v2 import visualizer_cam_v2
-from routes.manager_stream_ia.routes import streaming_ia_bp, socketio
-
 from routes import manage_cam_device_route, device_info_route
 from flask_cors import CORS
-from model import device_info_model
-from model import users_model
+from model import device_info_model, users_model
 from routes.url_rtsp.models import UrlRtsp
 
-
-# create the Flask app
-
+# Criação do Flask app
 app = Flask(__name__)
-
 
 # Configura CORS para permitir conexões WebSocket
 CORS(app)
 
-# Registra o Blueprint com o prefixo que usam websocket
-app.register_blueprint(streaming_ia_bp, url_prefix="/streaming_ia")
 
-socketio.init_app(app, cors_allowed_origins="*")
 
-if __name__ == "__main__":
-    socketio.run(app, host="localhost", port=5000, debug=True)
-
-@socketio.on("connect")
-def handle_connect():
-    print("Cliente conectado")
-
-@socketio.on("disconnect")
-def handle_disconnect():
-    print("Cliente desconectado")
-    
-# configure the MariaDb database
+# Configuração do banco de dados MariaDB
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     "mariadb+mariadbconnector://fabio:root@127.0.0.1:3306/rtsp_conn_api"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
-
+# Testa a conexão com o banco de dados
 def test_db_connection():
     try:
         with app.app_context():
-            # Obtém uma conexão com o banco de dados
             with db.engine.connect() as connection:
-                # Cria a consulta usando sqlalchemy.text
                 result = connection.execute(text("SELECT 1"))
                 for row in result:
-                    print(
-                        f"Conexão bem-sucedida ao banco de dados! Resultado: {row[0]}"
-                    )
+                    print(f"Conexão bem-sucedida ao banco de dados! Resultado: {row[0]}")
     except Exception as e:
         print(f"Erro ao conectar ao banco de dados: {e}")
         return False
     return True
 
-
 test_db_connection()
 
-
-
-
-# Criação das tabelas (todas as tabelas definidas nos modelos)
+# Criação das tabelas no banco de dados
 with app.app_context():
-    db.create_all()  # Cria as tabelas se não existirem
+    db.create_all()
 
+# Registra os Blueprints
 app.register_blueprint(url_rtsp, url_prefix="/url_rtsp")
-app.register_blueprint(
-    visualizer_cam, url_prefix="/visualizer_cam"
-)  # Registra o Blueprint com o prefixo /vizualizer_cam
-app.register_blueprint(
-    visualizer_cam_v2, url_prefix="/visualizer_cam_v2"
-)  # Registra o Blueprint com o prefixo /vizualizer_cam_v2
-app.register_blueprint(
-    manage_cam_device_route.manage_cam_device_bp, url_prefix="/manage_cam_device"
-)  # Registra o Blueprint com o prefixo /manage_cam_device
-app.register_blueprint(
-    device_info_route.device_info_bp, url_prefix="/device_info"
-)  # Registra o Blueprint com o prefixo /device_info
+app.register_blueprint(visualizer_cam, url_prefix="/visualizer_cam")
+app.register_blueprint(visualizer_cam_v2, url_prefix="/visualizer_cam_v2")
+app.register_blueprint(manage_cam_device_route.manage_cam_device_bp, url_prefix="/manage_cam_device")
+app.register_blueprint(device_info_route.device_info_bp, url_prefix="/device_info")
+
+

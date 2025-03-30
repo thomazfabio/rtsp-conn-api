@@ -3,6 +3,8 @@ import cv2
 import threading
 import asyncio
 import time
+import base64
+import uuid
 from collections import deque
 from . import visualizer_cam_v2
 from ws.ws import send_frame
@@ -23,7 +25,7 @@ class StreamManager:
             if not stream.initialize():
                 return False, "Erro ao inicializar o stream."
             self.streams[url] = stream
-            return True, "Stream iniciado com sucesso."
+            return True, f"Stream iniciado com sucesso"
 
     def stop_stream(self, url):
         with self.lock:
@@ -101,8 +103,12 @@ class VideoStream:
                     frame,
                     [cv2.IMWRITE_JPEG_QUALITY,70],
                 )
+                
+                #converte para base 64 json 
+                
+                frame64 = base64.b64encode(frame).decode('utf-8')
                
-               
+                send_frame(buffer)
                 
                 if ret:
                     self.buffer.append(buffer.tobytes())
