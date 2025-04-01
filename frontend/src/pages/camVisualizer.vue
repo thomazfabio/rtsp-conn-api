@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col v-for="(cam, index) in allCamDData" :key="index" cols="12" lg="4" md="6">
-        <visualizeCamV2  :stream-url="cam.full_cam_url_stream" :cam-name="cam.cam_name" :cam-grup="cam.grupo" :cam-channel="cam.device_config.channel" :url-rtsp="cam.full_cam_url_rtsp"/>
+        <visualizeCamV2  :cam-name="cam.cam_name" :cam-grup="cam.grupo" :cam-channel="cam.device_config.channel" :url-rtsp="cam.full_cam_url_rtsp"/>
       </v-col>
     </v-row>
   </v-container>

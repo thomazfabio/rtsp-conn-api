@@ -1,6 +1,6 @@
 <template>
   <v-card class="mx-auto">
-    <playerStreamV2 :stream-url="streamUrl" :url-rtsp="urlRtsp"/>
+    <playerStreamV2 :url-rtsp="urlRtsp"/>
 
     <v-card-title>
       Grupo: {{ camGrup }}
@@ -39,7 +39,6 @@ import { ref } from 'vue'
 import playerStreamV2 from '@/components/manageCam/playerStreamV2.vue'
 
 defineProps({
-  streamUrl: String,
   urlRtsp: String,
   camName: String,
   camGrup: String,

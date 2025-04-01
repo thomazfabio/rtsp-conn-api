@@ -10,7 +10,6 @@ from . import visualizer_cam_v2
 from ws.ws import send_frame
 # Gerenciamento de streams ativos
 
-
 class StreamManager:
     def __init__(self):
         self.streams = {}
@@ -18,31 +17,33 @@ class StreamManager:
 
     def start_stream(self, url):
         with self.lock:
-            if url in self.streams:
-                return False, "Stream já está ativo."
-            # Criação do stream
+            # Criar um ID único para o stream
+            stream_id = str(uuid.uuid4())
+
+            # Criar e iniciar o stream
             stream = VideoStream(url)
             if not stream.initialize():
                 return False, "Erro ao inicializar o stream."
-            self.streams[url] = stream
-            return True, f"Stream iniciado com sucesso"
 
-    def stop_stream(self, url):
+            # Armazenar o stream no dicionário usando o ID
+            self.streams[stream_id] = stream
+
+            return True, stream_id  # Retorna o ID gerado
+
+    def stop_stream(self, stream_id):
         with self.lock:
-            if url not in self.streams:
+            if stream_id not in self.streams:
                 return False, "Stream não encontrado."
-            self.streams[url].stop()
-            del self.streams[url]
+
+            self.streams[stream_id].stop()
+            del self.streams[stream_id]
             return True, "Stream parado com sucesso."
 
-    def get_stream(self, url):
+    def get_stream(self, stream_id):
         with self.lock:
-            return self.streams.get(url)
-
+            return self.streams.get(stream_id)
 
 # Gerenciamento individual de stream
-
-
 class VideoStream:
     def __init__(self, url):
         self.url = url
@@ -64,7 +65,7 @@ class VideoStream:
 
 
     def _read_frames(self):
-        target_fps = 15  # FPS desejado
+        target_fps = 16  # FPS desejado
         frame_time = 1.0 / target_fps  # Tempo ideal entre frames
 
         while self.running:
@@ -91,25 +92,14 @@ class VideoStream:
             if ret:
                 frame = cv2.resize(frame, (640, 480))
                 #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                # Tipo do frame (normalmente será numpy.ndarray se for uma imagem do OpenCV)
-                
-
-                
-                # Codifica o frame em JPEG
-
-               
+                # Tipo do frame (normalmente será numpy.ndarray se for uma imagem do OpenCV)          
+                # Codifica o frame em JPEG         
                 ret, buffer = cv2.imencode(
                     ".jpg",
                     frame,
                     [cv2.IMWRITE_JPEG_QUALITY,70],
-                )
-                
-                #converte para base 64 json 
-                
-                frame64 = base64.b64encode(frame).decode('utf-8')
-               
-                send_frame(buffer)
-                
+                )  
+                #converte para base 64 json                 
                 if ret:
                     self.buffer.append(buffer.tobytes())
                     
@@ -143,54 +133,48 @@ stream_manager = StreamManager()
 
 @visualizer_cam_v2.route("/start_stream", methods=["POST"])
 def start_stream():
-    """
-    Endpoint para iniciar um stream.
-    """
     data = request.get_json()
-    if not data or "url" not in data:
+    if not data or "url_rtsp" not in data:
         return jsonify({"message": "JSON inválido ou URL ausente."}), 400
 
-    url = data["url"]
-    success, message = stream_manager.start_stream(url)
-    status_code = 200 if success else 500
-    return jsonify({"message": message}), status_code
+    url = data["url_rtsp"]
+    success, stream_id = stream_manager.start_stream(url)
+
+    if success:
+        return jsonify({
+            "message": "Stream iniciado com sucesso",
+            "stream_id": stream_id,
+            "stream_url": f"http://127.0.0.1:5000/visualizer_cam_v2/stream?stream_id={stream_id}"
+        }), 200
+    else:
+        return jsonify({"message": stream_id}), 500
+
 
 
 @visualizer_cam_v2.route("/stop_stream", methods=["POST"])
 def stop_stream():
-    """
-    Endpoint para parar um stream.
-    """
     data = request.get_json()
-    if not data or "url" not in data:
-        return jsonify({"message": "JSON inválido ou URL ausente."}), 400
+    if not data or "stream_id" not in data:
+        return jsonify({"message": "JSON inválido ou stream_id ausente."}), 400
 
-    url = data["url"]
-    success, message = stream_manager.stop_stream(url)
-    status_code = 200 if success else 404
-    return jsonify({"message": message}), status_code
+    stream_id = data["stream_id"]
+    success, message = stream_manager.stop_stream(stream_id)
+    return jsonify({"message": message}), 200 if success else 404
+
 
 
 @visualizer_cam_v2.route("/stream", methods=["GET"])
 def stream_video():
-    """
-    Endpoint para transmitir o vídeo em MJPEG com controle de taxa.
-    """
-    url = request.args.get("url")
-    if not url:
-        return jsonify({"message": "URL ausente."}), 400
+    stream_id = request.args.get("stream_id")
+    if not stream_id:
+        return jsonify({"message": "stream_id ausente."}), 400
 
-    stream = stream_manager.get_stream(url)
+    stream = stream_manager.get_stream(stream_id)
     if not stream:
-        return (
-            jsonify(
-                {"message": "Stream não encontrado. Use '/start_stream' primeiro."}
-            ),
-            404,
-        )
+        return jsonify({"message": "Stream não encontrado."}), 404
 
     def generate():
-        fps_limit = 15  # Limitar a 10 frames por segundo (ajustável)
+        fps_limit = 16  # Limitar a 10 frames por segundo (ajustável)
         frame_interval = 1 / fps_limit
         last_frame_time = time.time()
 

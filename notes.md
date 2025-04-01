@@ -15,4 +15,7 @@
 }'''
 
 # exemplo de url completa dvr intelbras hdcvi 1004 g2
-rtsp://admin:227802@192.168.15.150:554/cam/realmonitor?channel=4&subtype=0
+rtsp://admin:227802@10.0.0.150:554/cam/realmonitor?channel=1&subtype=0
+
+# isso roda servidor gunicorn
+venv/bin/gunicorn -k eventlet -w 1 -b 0.0.0.0:5000 app:app

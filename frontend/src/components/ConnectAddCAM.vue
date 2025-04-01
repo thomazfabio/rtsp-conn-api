@@ -2,7 +2,7 @@
   <v-stepper :mobile="isMobile" hide-actions ref="stepper" :items="['Passo 1', 'Passo 2', 'Passo 3', 'Passo 4']"
     v-model="step">
     <template v-slot:item.1>
-      <v-card >
+      <v-card>
         <v-card-title class="pr-0 pl-0">Selecione o tipo de dispositivo</v-card-title>
         <v-row>
           <v-container class="pr-0 pl-0">
@@ -133,10 +133,24 @@
             </v-row>
           </template>
           <template v-else-if="selectedDeviceType === 'URL da Web'">
-            <!-- Configurações para NVR -->
-            <v-text-field></v-text-field>
-            <v-text-field></v-text-field>
-            <v-text-field></v-text-field>
+            <v-card-subtitle class="pr-0 pl-0">Informações da URL da cãmera</v-card-subtitle>
+            <!-- Configurações para URL direta -->
+            <v-divider class="mt-1 mb-8" />
+
+            <v-row>
+              <v-col cols="12" lg="12" class="pb-0 pt-0 mt-0 mb-0">
+                <v-row>
+                  <v-checkbox class="pl-1 mr-5" v-model="protocolCkeckBox" label="RTSP" value="RTSP"
+                    color="info"></v-checkbox>
+                </v-row>
+              </v-col>
+
+              <v-col cols="12" xl="8" lg="8" md="8" sm="8">
+                <v-text-field v-model="camData.camUrl" label="URL da Câmera" variant="outlined"
+                  density="compact"></v-text-field>
+              </v-col>
+            </v-row>
+
           </template>
           <template v-else>
             <p>Selecione um tipo de dispositivo para configurar os detalhes.</p>
@@ -146,8 +160,8 @@
     </template>
 
     <template v-slot:item.3>
-      <v-alert class="mb-1" v-if="alerts.alert_teste_url.status" :type="alerts.alert_teste_url.type" variant="outlined" closable
-        dismissible>
+      <v-alert class="mb-1" v-if="alerts.alert_teste_url.status" :type="alerts.alert_teste_url.type" variant="outlined"
+        closable dismissible>
         {{ alerts.alert_teste_url.msg }}
       </v-alert>
       <v-card :loading="loading.await_status_url" :disabled="loading.await_status_url">
@@ -156,8 +170,15 @@
         <v-card-text class="pr-0 pl-0">Essa é sua URL:</v-card-text>
         <v-container class="pr-0 pl-0">
           <v-row class="mb-4">
-            <v-col>
+
+            <v-col v-if="selectedDeviceType === 'DVR'">
               <span class="text-primary font-weight-bold">{{ fullUrl }}</span>
+            </v-col>
+            <v-col v-else-if="selectedDeviceType === 'Camera IP'">
+              <span class="text-primary font-weight-bold">{{ fullUrl }}</span>
+            </v-col>
+            <v-col v-else-if="selectedDeviceType === 'URL da Web'">
+              <span class="text-primary font-weight-bold">{{ camData.camUrl }}</span>
             </v-col>
           </v-row>
           <v-divider />
@@ -177,9 +198,10 @@
       </v-card>
     </template>
 
+
     <template v-slot:item.4>
-      <v-alert class="mb-1" v-if="alerts.alert_save_cam.status" :type="alerts.alert_save_cam.type" variant="outlined" closable
-        dismissible>
+      <v-alert class="mb-1" v-if="alerts.alert_save_cam.status" :type="alerts.alert_save_cam.type" variant="outlined"
+        closable dismissible>
         {{ alerts.alert_save_cam.msg }}
       </v-alert>
       <v-card :loading="loading.await_status_save_cam" :disabled="loading.await_status_save_cam">
@@ -187,47 +209,28 @@
         <v-container class="pr-0 pl-0">
           <v-row>
             <v-col>
-              <span class="font-weight-bold">URL :  </span>
+              <span class="font-weight-bold">URL : </span>
               <span class="text-primary font-weight-bold"> {{ fullUrl }}</span>
             </v-col>
           </v-row>
+          <v-divider class="mt-3 mb-3" />
           <v-row>
-            <v-col cols="12" xl="5" lg="5" md="6" sm="8">
-              <v-divider class="mb-4" />
-              <v-row>
-                <v-col>
-                  <v-btn color="info" prepend-icon="mdi-play-speed" stacked variant="outlined" class="w-75"
-                    @click="controleCamActions.startStream">play</v-btn>
-                </v-col>
-                <v-col class="d-flex justify-center">
-                  <v-btn color="red" prepend-icon="mdi-stop-circle-outline" stacked variant="outlined" class="w-75"
-                    @click="controleCamActions.stopStream">stop</v-btn>
-                </v-col>
-                <v-col class="d-flex justify-end">
-                  <v-btn color="yellow-darken-2" prepend-icon="mdi-refresh" stacked variant="outlined"
-                    class="w-75">refresh</v-btn>
-                </v-col>
-              </v-row>
-              <v-divider class="mb-4 mt-4" />
+            <v-col cols="12" lg="6" md="6" class="pa-0">
+              
+                <playerStreamV2 :urlRtsp="fullUrl" />
+              
+            </v-col>
+
+            <v-col>
+              <p class="text-h6 mb-3">Identificação da cãmera</p>
               <v-form>
                 <v-text-field v-model="camData.camName" variant="outlined" label="Nome da Câmera"
                   density="compact"></v-text-field>
                 <v-text-field v-model="camData.grupo" variant="outlined" label="Grupo / Local"
                   density="compact"></v-text-field>
               </v-form>
-              <v-divider class="mb-4" />
-              <v-row>
-                <v-col class="">
-                  <v-btn color="green-darken-2" prepend-icon="mdi-content-save-cog-outline" rounded="xl"
-                    variant="outlined" @click="saveCamData">salvar configurações</v-btn>
-                </v-col>
-              </v-row>
-              <v-divider class="mb-4 mt-4" />
-            </v-col>
-            <v-col class="d-flex justify-center">
-              <camSimpleVisualizer :cam-url="fullUrl" :visualizer-url="'/visualizer_cam_v2/stream'"
-                :cam-name="camData.camName" :grupo="camData.grupo" :cam-chennel="deviceFullInfo.channel"
-                @url-ready="urlReady" ref="controleCam" />
+              <v-btn color="green-darken-2" prepend-icon="mdi-content-save-cog-outline" rounded="xl"
+              variant="outlined" @click="saveCamData">salvar configurações</v-btn>
             </v-col>
           </v-row>
         </v-container>
@@ -245,8 +248,9 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useCamUrlMenageStore } from "../stores/utils/camUrlMenage";
 import { useCreateCamFullDataStore } from "../stores/deviceManage/createCamFullData";
 import { useManageDeviceInfoStore } from "../stores/deviceManage/manageDeviceInfo";
-import camSimpleVisualizer from "./camVizualizer/camSimpleVisualizer.vue";
 import { useDisplay } from "vuetify";
+
+import playerStreamV2 from "./manageCam/playerStreamV2.vue";
 
 // instanciando stores
 const storeManageDeviceInfo = useManageDeviceInfoStore();
@@ -376,23 +380,28 @@ const camData = ref({
 
 // URL completa rtsp
 const fullUrl = computed(() => {
-  return (
-    protocolCkeckBox.value[0].toLowerCase() +
-    "://" +
-    deviceFullInfo.value.user +
-    ":" +
-    deviceFullInfo.value.pass +
-    "@" +
-    deviceFullInfo.value.ip +
-    ":" +
-    deviceFullInfo.value.porta +
-    "/" +
-    deviceFullInfo.value.path +
-    "?channel=" +
-    deviceFullInfo.value.channel +
-    "&subtype=" +
-    deviceFullInfo.value.preferedStream
-  );
+
+  if (selectedDeviceType.value === "URL da Web") {
+    return camData.value.camUrl;
+  } else if (selectedDeviceType.value === "Camera IP" || selectedDeviceType.value === "DVR") {
+    return (
+      protocolCkeckBox.value[0].toLowerCase() +
+      "://" +
+      deviceFullInfo.value.user +
+      ":" +
+      deviceFullInfo.value.pass +
+      "@" +
+      deviceFullInfo.value.ip +
+      ":" +
+      deviceFullInfo.value.porta +
+      "/" +
+      deviceFullInfo.value.path +
+      "?channel=" +
+      deviceFullInfo.value.channel +
+      "&subtype=" +
+      deviceFullInfo.value.preferedStream
+    );
+  }
 });
 
 // Funções para navegação
@@ -489,11 +498,7 @@ const controleCamActions = {
   },
 };
 
-// pega url de streaming do componente filho
-function urlReady(url) {
-  urlStreamReady.value = url;
-  console.log(urlStreamReady.value);
-}
+
 
 // chamadas na store para salvar dados
 const saveCamData = async () => {
@@ -515,7 +520,7 @@ const saveCamData = async () => {
     "device_id": camData.value.deviceId,
     "cam_name": camData.value.camName,
     "grupo": camData.value.grupo,
-    "full_cam_url_stream": urlStreamReady.value,
+    "full_cam_url_stream": '',
     "full_cam_url_rtsp": fullUrl.value,
     "cam_status": "online",
     "device_config": device
@@ -526,8 +531,8 @@ const saveCamData = async () => {
   try {
     const response = await storeCreateCamFullData.createCamFullData(fullCamData);
     loading.value.await_status_save_cam = false;
-    
-   
+
+
     alerts.value.alert_save_cam.status = true;
     alerts.value.alert_save_cam.type = "success";
     alerts.value.alert_save_cam.msg = "Dados da câmera salvo com sucesso!";

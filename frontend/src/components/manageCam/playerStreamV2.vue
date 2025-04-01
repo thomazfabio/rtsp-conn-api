@@ -1,6 +1,6 @@
 <template>
     <v-container class="mb-0 pb-0">
-        <v-img v-if="isStreaming" :src="streamUrl" contain class="w-100 h-100" />
+        <v-img v-if="isStreaming" :src="streamurl" contain class="w-100 h-100" />
     </v-container>
     <!-- controles do stream -->
     <v-container class="pt-0 mt-0">
@@ -10,13 +10,13 @@
                 @click="startStream(urlRtsp)"></v-btn>
 
             <v-btn class="pa-0" color="red" prepend-icon="mdi-stop-circle-outline" height="50" stacked
-                variant="plain" @click="stopStream(urlRtsp)"></v-btn>
+                variant="plain" @click="stopStream(stream_id)"></v-btn>
 
             <v-btn class="pa-0" color="blue" prepend-icon="mdi-refresh" height="50" stacked variant="plain"></v-btn>
         </v-sheet>
 
     </v-container>
-    <v-divider />
+   
 </template>
 
 <script setup>
@@ -29,22 +29,21 @@ const isStreaming = ref(true);
 const refreshStream = ref(null);
 
 const props = defineProps({
-    streamUrl: String,
     urlRtsp: String,
 });
 
-// gerar url com reflesh
-const streamUrl = computed(() => {
-    return `${props.streamUrl}?url=${encodeURIComponent(props.urlRtsp)}&refresh=${refreshStream.value}`;
-});
+//essa url que o backend devolve
+const streamurl = ref(null);
+const stream_id = ref(null);
 
 
 async function startStream(x) {
     const urlRtsp = x;
     try {
-        await visualizerCamV2Store.startStream(urlRtsp);
-        refreshStream.value = Date.now(); // Força uma mudança na URL
-        isStreaming.value = true;
+        const  response = await visualizerCamV2Store.startStream(urlRtsp);
+        streamurl.value = response.data.stream_url;
+        stream_id.value = response.data.stream_id;
+        console.log(response.data);
     } catch (err) {
         console.error("Erro ao iniciar stream:", err);
     }

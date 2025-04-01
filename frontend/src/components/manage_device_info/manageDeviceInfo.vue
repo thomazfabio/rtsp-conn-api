@@ -208,6 +208,7 @@ const deviceTypes = [
     { label: 'Câmera IP', value: 'ip_cam' },
     { label: 'DVR', value: 'dvr' },
     { label: 'NVR', value: 'nvr' },
+    { label: 'URL da Web', value: 'web_url' },
 ]
 
 
