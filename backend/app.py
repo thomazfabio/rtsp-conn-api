@@ -8,8 +8,11 @@ from flask_cors import CORS
 from model import device_info_model, users_model
 from routes.url_rtsp.models import UrlRtsp
 
+
+
 # Criação do Flask app
 app = Flask(__name__)
+
 
 # Configura CORS para permitir conexões WebSocket
 CORS(app)
@@ -47,4 +50,5 @@ app.register_blueprint(url_rtsp, url_prefix="/url_rtsp")
 app.register_blueprint(manage_cam_device_route.manage_cam_device_bp, url_prefix="/manage_cam_device")
 app.register_blueprint(device_info_route.device_info_bp, url_prefix="/device_info")
 app.register_blueprint(stream_route.stream, url_prefix="/stream")
+
 
