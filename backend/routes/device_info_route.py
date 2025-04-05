@@ -1,34 +1,70 @@
-from flask import Blueprint, request, jsonify
+from flask_restx import Namespace, Resource, fields
+from flask import request
 from controllers import device_info_controller
 
-device_info_bp = Blueprint('device_info_bp', __name__) # device_info_bp is the Blueprint name
+# Criação do Namespace
+ns = Namespace('Device Info', description='Operações relacionadas aos dispositivos')
 
-@device_info_bp.route('/create', methods=['POST'])
-def create():
-    data = request.get_json()
-    return device_info_controller.create(data)
+# Modelo para criação/atualização (exemplo — pode ser ajustado conforme seu schema)
+device_model = ns.model('Device', {
+    'nome': fields.String(required=True, description='Nome do dispositivo'),
+    'tipo': fields.String(required=True, description='Tipo do dispositivo'),
+    # Adicione mais campos aqui conforme necessário
+})
 
-@device_info_bp.route('/update', methods=['PUT'])
-def update():
-    data = request.get_json()
-    return device_info_controller.update(data)
+# Rota: Criar dispositivo
+@ns.route('/create')
+class CreateDevice(Resource):
+    @ns.expect(device_model)
+    @ns.doc(description="Cria um novo dispositivo.")
+    def post(self):
+        data = request.get_json()
+        return device_info_controller.create(data)
 
-@device_info_bp.route('/delete', methods=['DELETE'])
-def delete():
-    id = request.args.get('id')
-    return device_info_controller.delete(id)
 
-@device_info_bp.route('/get_all', methods=['GET'])
-def get_all():
-    return device_info_controller.get_all()
+# Rota: Atualizar dispositivo
+@ns.route('/update')
+class UpdateDevice(Resource):
+    @ns.expect(device_model)
+    @ns.doc(description="Atualiza as informações de um dispositivo.")
+    def put(self):
+        data = request.get_json()
+        return device_info_controller.update(data)
 
-@device_info_bp.route('/get_by_id', methods=['GET'])
-def get_by_id():
-    id = request.args.get('id')
-    return device_info_controller.get_by_id(id)
 
-@device_info_bp.route('/get_by_type', methods=['GET'])
-def get_by_type():
-    tipo = request.args.get('device_tipo')
-    return device_info_controller.get_by_type(tipo)
+# Rota: Deletar dispositivo por ID (query param)
+@ns.route('/delete')
+class DeleteDevice(Resource):
+    @ns.doc(params={'id': 'ID do dispositivo a ser deletado'})
+    def delete(self):
+        id = request.args.get('id')
+        return device_info_controller.delete(id)
 
+
+# Rota: Buscar todos os dispositivos
+@ns.route('/get_all')
+class GetAllDevices(Resource):
+    @ns.doc(description="Retorna todos os dispositivos cadastrados.")
+    def get(self):
+        return device_info_controller.get_all()
+
+
+# Rota: Buscar dispositivo por ID
+@ns.route('/get_by_id')
+class GetDeviceById(Resource):
+    @ns.doc(params={'id': 'ID do dispositivo'}, description="Busca um dispositivo pelo ID.")
+    def get(self):
+        id = request.args.get('id')
+        return device_info_controller.get_by_id(id)
+
+
+# Rota: Buscar dispositivo por tipo
+@ns.route('/get_by_type')
+class GetDeviceByType(Resource):
+    @ns.doc(params={'device_tipo': 'Tipo do dispositivo'}, description="Busca dispositivos por tipo.")
+    def get(self):
+        tipo = request.args.get('device_tipo')
+        return device_info_controller.get_by_type(tipo)
+
+# Exporta o namespace para ser adicionado na API principal
+api = ns
