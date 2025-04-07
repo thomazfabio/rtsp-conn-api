@@ -216,9 +216,9 @@
           <v-divider class="mt-3 mb-3" />
           <v-row>
             <v-col cols="12" lg="6" md="6" class="pa-0">
-              
-                <playerStreamV2 :urlRtsp="fullUrl" />
-              
+
+              <playerStreamV2 :urlRtsp="fullUrl" />
+
             </v-col>
 
             <v-col>
@@ -229,8 +229,8 @@
                 <v-text-field v-model="camData.grupo" variant="outlined" label="Grupo / Local"
                   density="compact"></v-text-field>
               </v-form>
-              <v-btn color="green-darken-2" prepend-icon="mdi-content-save-cog-outline" rounded="xl"
-              variant="outlined" @click="saveCamData">salvar configurações</v-btn>
+              <v-btn color="green-darken-2" prepend-icon="mdi-content-save-cog-outline" rounded="xl" variant="outlined"
+                @click="saveCamData">salvar configurações</v-btn>
             </v-col>
           </v-row>
         </v-container>
@@ -332,6 +332,16 @@ watch(selectedDeviceType, async (newVal) => {
     console.log("URL da Web selecionada");
     const device = await storeManageDeviceInfo.searchDeviceInfoByType("web_url").then((res) => {
       console.log(res.data);
+      // Armazena todos os dispositivos retornados
+      allDevices.value = res.data;
+
+      // Extrai os fabricantes e remove duplicatas
+      const uniqueManufacturers = [...new Set(res.data.map(item => item.fabricante))];
+
+      // Atualiza a variável reativa
+      manufacturers.value = uniqueManufacturers;
+      // Atualiza o id do dispositivo para a camera
+      camData.value.deviceId = res.data[0].id;
     }).catch((err) => {
       console.error(err);
     });

@@ -20,7 +20,7 @@ export const useCamUrlMenageStore = defineStore("cam-url-menage", () => {
   }
   async function testeUrlRtsp(payload) {
     const url = { url: payload };
-    const status = await api.post("/url_rtsp/teste_url", url);
+    const status = await api.post("/services/teste_url", url);
     console.log(status.data);
     cam.value.status = status.data.status;
     return status;

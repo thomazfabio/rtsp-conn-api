@@ -54,11 +54,9 @@ with app.app_context():
 
 # Registra os Blueprints
 # app.register_blueprint(services_route.url_rtsp_bp, url_prefix="/services")
-app.register_blueprint(
-    manage_cam_device_route.manage_cam_device_bp, url_prefix="/manage_cam_device"
-)
+#app.register_blueprint( manage_cam_device_route.manage_cam_device_bp, url_prefix="/manage_cam_device")
 # app.register_blueprint(device_info_route.device_info_bp, url_prefix="/device_info")
-app.register_blueprint(stream_route.stream, url_prefix="/stream")
+# app.register_blueprint(stream_route.stream, url_prefix="/stream")
 
 api = Api(
     app,
@@ -73,4 +71,8 @@ api = Api(
 )
 
 api.add_namespace(services_ns, path="/services")
-api.add_namespace(device_info_route.ns, path="/device_info")  # Adiciona o namespace de device_info
+api.add_namespace(
+    device_info_route.ns, path="/device_info"
+)  # Adiciona o namespace de device_info
+api.add_namespace(stream_route.ns, path="/stream")  # Adiciona o namespace de stream
+api.add_namespace(manage_cam_device_route.ns, path="/manage_cam_device")
