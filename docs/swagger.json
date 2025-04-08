@@ -1,0 +1,466 @@
+{
+    "swagger": "2.0",
+    "basePath": "/",
+    "paths": {
+        "/device_info/create": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "description": "Cria um novo dispositivo.",
+                "operationId": "post_create_device",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Device"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Device Info"
+                ]
+            }
+        },
+        "/device_info/delete": {
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "operationId": "delete_delete_device",
+                "parameters": [
+                    {
+                        "description": "ID do dispositivo a ser deletado",
+                        "name": "id",
+                        "type": "string",
+                        "in": "query"
+                    }
+                ],
+                "tags": [
+                    "Device Info"
+                ]
+            }
+        },
+        "/device_info/get_all": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "description": "Retorna todos os dispositivos cadastrados.",
+                "operationId": "get_get_all_devices",
+                "tags": [
+                    "Device Info"
+                ]
+            }
+        },
+        "/device_info/get_by_id": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "description": "Busca um dispositivo pelo ID.",
+                "operationId": "get_get_device_by_id",
+                "parameters": [
+                    {
+                        "description": "ID do dispositivo",
+                        "name": "id",
+                        "type": "string",
+                        "in": "query"
+                    }
+                ],
+                "tags": [
+                    "Device Info"
+                ]
+            }
+        },
+        "/device_info/get_by_type": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "description": "Busca dispositivos por tipo.",
+                "operationId": "get_get_device_by_type",
+                "parameters": [
+                    {
+                        "description": "Tipo do dispositivo",
+                        "name": "device_tipo",
+                        "type": "string",
+                        "in": "query"
+                    }
+                ],
+                "tags": [
+                    "Device Info"
+                ]
+            }
+        },
+        "/device_info/update": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "description": "Atualiza as informa\u00e7\u00f5es de um dispositivo.",
+                "operationId": "put_update_device",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Device"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Device Info"
+                ]
+            }
+        },
+        "/manage_cam_device/create": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Dispositivo criado"
+                    }
+                },
+                "summary": "Cria um novo dispositivo",
+                "operationId": "post_create_device",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Device"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Manage Cam Device"
+                ]
+            }
+        },
+        "/manage_cam_device/delete": {
+            "parameters": [
+                {
+                    "description": "ID do dispositivo a ser deletado",
+                    "name": "id",
+                    "type": "string",
+                    "in": "query"
+                }
+            ],
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "Dispositivo deletado"
+                    }
+                },
+                "summary": "Deleta um dispositivo pelo ID",
+                "operationId": "delete_delete_device",
+                "tags": [
+                    "Manage Cam Device"
+                ]
+            }
+        },
+        "/manage_cam_device/get": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Retorna dicion\u00e1rio vazio"
+                    }
+                },
+                "summary": "Retorna objeto vazio (stub)",
+                "operationId": "get_get_stub",
+                "tags": [
+                    "Manage Cam Device"
+                ]
+            }
+        },
+        "/manage_cam_device/get_by_id": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Retorna dicion\u00e1rio vazio"
+                    }
+                },
+                "summary": "Retorna objeto vazio (stub)",
+                "operationId": "get_get_by_id_stub",
+                "tags": [
+                    "Manage Cam Device"
+                ]
+            }
+        },
+        "/manage_cam_device/list_by_user_id": {
+            "parameters": [
+                {
+                    "description": "ID do usu\u00e1rio",
+                    "name": "user_id",
+                    "type": "string",
+                    "in": "query"
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Lista de dispositivos"
+                    }
+                },
+                "summary": "Lista dispositivos por ID de usu\u00e1rio",
+                "operationId": "get_list_devices",
+                "tags": [
+                    "Manage Cam Device"
+                ]
+            }
+        },
+        "/manage_cam_device/update": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "Dispositivo atualizado"
+                    }
+                },
+                "summary": "Atualiza um dispositivo existente",
+                "operationId": "put_update_device",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Device"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Manage Cam Device"
+                ]
+            }
+        },
+        "/services/teste_url": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "Retorna status 'online' se a URL for acess\u00edvel ou 'error' se falhar."
+                    }
+                },
+                "description": "Endpoint para testar a conex\u00e3o com uma URL RTSP.",
+                "operationId": "post_teste_url",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/UrlModel"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Services"
+                ]
+            }
+        },
+        "/stream/get_stream": {
+            "parameters": [
+                {
+                    "description": "ID da stream ativa",
+                    "name": "stream_id",
+                    "type": "string",
+                    "in": "query"
+                }
+            ],
+            "get": {
+                "responses": {
+                    "404": {
+                        "description": "Stream n\u00e3o encontrada"
+                    },
+                    "400": {
+                        "description": "stream_id ausente"
+                    },
+                    "200": {
+                        "description": "Transmiss\u00e3o de v\u00eddeo"
+                    }
+                },
+                "summary": "Transmite os frames da c\u00e2mera via MJPEG",
+                "operationId": "get_get_stream",
+                "tags": [
+                    "Stream"
+                ]
+            }
+        },
+        "/stream/start_stream": {
+            "post": {
+                "responses": {
+                    "500": {
+                        "description": "Erro ao iniciar stream"
+                    },
+                    "400": {
+                        "description": "JSON inv\u00e1lido ou URL ausente"
+                    },
+                    "200": {
+                        "description": "Stream iniciada com sucesso"
+                    }
+                },
+                "summary": "Inicia uma nova transmiss\u00e3o RTSP",
+                "operationId": "post_start_stream",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/StartStreamModel"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Stream"
+                ]
+            }
+        },
+        "/stream/stop_stream": {
+            "post": {
+                "responses": {
+                    "404": {
+                        "description": "Stream n\u00e3o encontrada"
+                    },
+                    "400": {
+                        "description": "JSON inv\u00e1lido ou stream_id ausente"
+                    },
+                    "200": {
+                        "description": "Stream parada com sucesso"
+                    }
+                },
+                "summary": "Encerra uma transmiss\u00e3o existente",
+                "operationId": "post_stop_stream",
+                "parameters": [
+                    {
+                        "name": "payload",
+                        "required": true,
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/StopStreamModel"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Stream"
+                ]
+            }
+        }
+    },
+    "info": {
+        "title": "API Video Streaming | Frame Processing | RTSP Management",
+        "version": "1.0.0",
+        "description": "API para gerenciamento de c\u00e2meras RTSP, Streaming de video e tratamento de FRAMES.",
+        "contact": {
+            "name": "Fabio Thomaz da Silva",
+            "email": "fabio_thomaz@live.com",
+            "url": null
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "produces": [
+        "application/json"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "tags": [
+        {
+            "name": "Services",
+            "description": "Funcionalidades de servi\u00e7os da API"
+        },
+        {
+            "name": "Device Info",
+            "description": "Opera\u00e7\u00f5es relacionadas aos dispositivos"
+        },
+        {
+            "name": "Stream",
+            "description": "Gerenciamento de transmiss\u00f5es RTSP em tempo real"
+        },
+        {
+            "name": "Manage Cam Device",
+            "description": "Gerenciamento dos dispositivos de c\u00e2mera"
+        }
+    ],
+    "definitions": {
+        "UrlModel": {
+            "required": [
+                "url"
+            ],
+            "properties": {
+                "url": {
+                    "type": "string",
+                    "description": "URL da c\u00e2mera RTSP"
+                }
+            },
+            "type": "object"
+        },
+        "Device": {
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "ID do dispositivo"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "Nome do dispositivo"
+                },
+                "user_id": {
+                    "type": "string",
+                    "description": "ID do usu\u00e1rio"
+                }
+            },
+            "type": "object"
+        },
+        "StartStreamModel": {
+            "required": [
+                "url_rtsp"
+            ],
+            "properties": {
+                "url_rtsp": {
+                    "type": "string",
+                    "description": "URL da c\u00e2mera RTSP"
+                }
+            },
+            "type": "object"
+        },
+        "StopStreamModel": {
+            "required": [
+                "stream_id"
+            ],
+            "properties": {
+                "stream_id": {
+                    "type": "string",
+                    "description": "ID da stream ativa"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "responses": {
+        "ParseError": {
+            "description": "When a mask can't be parsed"
+        },
+        "MaskError": {
+            "description": "When any error occurs on mask"
+        }
+    }
+}
