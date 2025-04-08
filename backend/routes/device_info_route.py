@@ -6,7 +6,7 @@ from controllers import device_info_controller
 ns = Namespace('Manage Device Info', description='Operações relacionadas aos dispositivos')
 
 # Modelo para criação/atualização (exemplo — pode ser ajustado conforme seu schema)
-device_model = ns.model('Device', {
+device_model = ns.model('DeviceCreate', {
     'id': fields.Integer(description='ID do modelo de dispositivo'),
     'tipo': fields.String(description='Tipo do dispositivo (ex: câmera, NVR, etc)'),
     'fabricante': fields.String(description='Fabricante do dispositivo'),
