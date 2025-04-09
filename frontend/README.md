@@ -1,79 +1,148 @@
-# Vuetify (Default)
+# 🎛️ Painel de Gerenciamento de Câmeras – RTSP Conn Panel
 
-This is the official scaffolding tool for Vuetify, designed to give you a head start in building your new Vuetify application. It sets up a base template with all the necessary configurations and standard directory structure, enabling you to begin development without the hassle of setting up the project from scratch.
+![License](https://img.shields.io/github/license/thomazfabio/rtsp-conn-panel?color=blue)
+![GitHub last commit](https://img.shields.io/github/last-commit/thomazfabio/rtsp-conn-panel)
+![GitHub issues](https://img.shields.io/github/issues/thomazfabio/rtsp-conn-panel)
+![Vue.js](https://img.shields.io/badge/Vue-3.x-brightgreen)
+![Vuetify](https://img.shields.io/badge/Vuetify-3.x-1867C0?logo=vuetify&logoColor=white)
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
 
-## ❗️ Important Links
+---
 
-- 📄 [Docs](https://vuetifyjs.com/)
-- 🚨 [Issues](https://issues.vuetifyjs.com/)
-- 🏬 [Store](https://store.vuetifyjs.com/)
-- 🎮 [Playground](https://play.vuetifyjs.com/)
-- 💬 [Discord](https://community.vuetifyjs.com)
+## 📌 Descrição
 
-## 💿 Install
+Este projeto é uma interface moderna desenvolvida com **Vue 3** + **Vuetify 3** para gerenciar câmeras IP e fluxos de vídeo RTSP/MJPEG. O painel conecta-se à API [RTSP Conn](https://thomazfabio.github.io/rtsp-conn-api/) para iniciar, listar e monitorar transmissões de vídeo em tempo real.
 
-Set up your project using your preferred package manager. Use the corresponding command to install the dependencies:
+---
 
-| Package Manager                                                | Command        |
-|---------------------------------------------------------------|----------------|
-| [yarn](https://yarnpkg.com/getting-started)                   | `yarn install` |
-| [npm](https://docs.npmjs.com/cli/v7/commands/npm-install)     | `npm install`  |
-| [pnpm](https://pnpm.io/installation)                          | `pnpm install` |
-| [bun](https://bun.sh/#getting-started)                        | `bun install`  |
+## ❗️ Links Úteis
 
-After completing the installation, your environment is ready for Vuetify development.
+- 📘 [Documentação da API Backend](https://thomazfabio.github.io/rtsp-conn-api/)
+- 🐛 [Relatar Problemas](https://github.com/thomazfabio/rtsp-conn-panel/issues)
+- 💬 [Back-end API (Repositório)](https://github.com/thomazfabio/rtsp-conn-api)
+- 🧩 [Vuetify Docs](https://vuetifyjs.com/)
+- 🎮 [Vuetify Playground](https://play.vuetifyjs.com/)
+- 💬 [Comunidade Vuetify (Discord)](https://community.vuetifyjs.com/)
 
-## ✨ Features
+---
 
-- 🖼️ **Optimized Front-End Stack**: Leverage the latest Vue 3 and Vuetify 3 for a modern, reactive UI development experience. [Vue 3](https://v3.vuejs.org/) | [Vuetify 3](https://vuetifyjs.com/en/)
-- 🗃️ **State Management**: Integrated with [Pinia](https://pinia.vuejs.org/), the intuitive, modular state management solution for Vue.
-- 🚦 **Routing and Layouts**: Utilizes Vue Router for SPA navigation and vite-plugin-vue-layouts for organizing Vue file layouts. [Vue Router](https://router.vuejs.org/) | [vite-plugin-vue-layouts](https://github.com/JohnCampionJr/vite-plugin-vue-layouts)
-- ⚡ **Next-Gen Tooling**: Powered by Vite, experience fast cold starts and instant HMR (Hot Module Replacement). [Vite](https://vitejs.dev/)
-- 🧩 **Automated Component Importing**: Streamline your workflow with unplugin-vue-components, automatically importing components as you use them. [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components)
+## ✨ Funcionalidades
 
-These features are curated to provide a seamless development experience from setup to deployment, ensuring that your Vuetify application is both powerful and maintainable.
+- 🎥 Visualização de streams RTSP/MJPEG em tempo real
+- 📡 Início/parada de transmissões conectadas à API
+- ➕ Cadastro e edição de câmeras com campos personalizados
+- 🧠 Suporte a análises inteligentes via back-end com IA
+- 🗂️ Interface intuitiva com layout responsivo
+- 📝 Logs de eventos e estados da conexão em tempo real
 
-## 💡 Usage
+---
 
-This section covers how to start the development server and build your project for production.
+## 🛠️ Tecnologias Utilizadas
 
-### Starting the Development Server
+- [Vue 3](https://vuejs.org/)
+- [Vuetify 3](https://vuetifyjs.com/)
+- [Pinia](https://pinia.vuejs.org/)
+- [Vue Router](https://router.vuejs.org/)
+- [Vite](https://vitejs.dev/)
+- [vite-plugin-vue-layouts](https://github.com/JohnCampionJr/vite-plugin-vue-layouts)
+- [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components)
 
-To start the development server with hot-reload, run the following command. The server will be accessible at [http://localhost:3000](http://localhost:3000):
+---
+
+## 💿 Instalação
+
+Clone o repositório e instale as dependências com o gerenciador de sua escolha:
 
 ```bash
-yarn dev
+git clone https://github.com/thomazfabio/rtsp-conn-panel.git
+cd rtsp-conn-panel
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+| Gerenciador de Pacotes | Comando        |
+|------------------------|----------------|
+| npm                    | `npm install`  |
+| yarn                   | `yarn install` |
+| pnpm                   | `pnpm install` |
+| bun                    | `bun install`  |
 
-> Add NODE_OPTIONS='--no-warnings' to suppress the JSON import warnings that happen as part of the Vuetify import mapping. If you are on Node [v21.3.0](https://nodejs.org/en/blog/release/v21.3.0) or higher, you can change this to NODE_OPTIONS='--disable-warning=5401'. If you don't mind the warning, you can remove this from your package.json dev script.
+> Após isso, o ambiente estará pronto para desenvolvimento.
 
-### Building for Production
+---
 
-To build your project for production, use:
+## ▶️ Executando em Desenvolvimento
+
+Para iniciar o servidor de desenvolvimento local:
 
 ```bash
-yarn build
+npm run dev
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+> Acesse em: [http://localhost:3000](http://localhost:3000)
 
-Once the build process is completed, your application will be ready for deployment in a production environment.
+⚠️ Para suprimir warnings de importação JSON do Vuetify, adicione:
 
-## 💪 Support Vuetify Development
+```bash
+NODE_OPTIONS='--no-warnings'
+```
 
-This project is built with [Vuetify](https://vuetifyjs.com/en/), a UI Library with a comprehensive collection of Vue components. Vuetify is an MIT licensed Open Source project that has been made possible due to the generous contributions by our [sponsors and backers](https://vuetifyjs.com/introduction/sponsors-and-backers/). If you are interested in supporting this project, please consider:
+Se estiver usando Node 21.3.0 ou superior:
 
-- [Requesting Enterprise Support](https://support.vuetifyjs.com/)
-- [Sponsoring John on Github](https://github.com/users/johnleider/sponsorship)
-- [Sponsoring Kael on Github](https://github.com/users/kaelwd/sponsorship)
-- [Supporting the team on Open Collective](https://opencollective.com/vuetify)
-- [Becoming a sponsor on Patreon](https://www.patreon.com/vuetify)
-- [Becoming a subscriber on Tidelift](https://tidelift.com/subscription/npm/vuetify)
-- [Making a one-time donation with Paypal](https://paypal.me/vuetify)
+```bash
+NODE_OPTIONS='--disable-warning=5401'
+```
 
-## 📑 License
-[MIT](http://opensource.org/licenses/MIT)
+---
 
-Copyright (c) 2016-present Vuetify, LLC
+## 📦 Build para Produção
+
+```bash
+npm run build
+```
+
+> A versão otimizada será gerada na pasta `dist/`.
+
+---
+
+## 📂 Estrutura do Projeto
+
+```
+📁 src
+ ┣ 📁 components        → Componentes Vue reutilizáveis
+ ┣ 📁 layouts           → Layouts dinâmicos com vue-layouts
+ ┣ 📁 pages             → Rotas e páginas principais
+ ┣ 📁 plugins           → Plugins e configurações
+ ┣ 📁 stores            → Estados gerenciados pelo Pinia
+ ┣ 📁 utils             → Funções utilitárias
+ ┣ 📄 App.vue
+ ┗ 📄 main.ts
+```
+
+---
+
+## 💪 Apoie o Vuetify
+
+Este projeto é construído sobre o Vuetify, um projeto open source mantido com apoio da comunidade.
+
+- 💼 [Solicite Suporte Empresarial](https://support.vuetifyjs.com/)
+- ⭐️ [Patrocine no GitHub](https://github.com/sponsors/johnleider)
+- 🤝 [Apoie via OpenCollective](https://opencollective.com/vuetify)
+- ❤️ [Doe no Patreon](https://www.patreon.com/vuetify)
+
+---
+
+## 🧩 Agradecimentos
+
+- [@vuetifyjs](https://github.com/vuetifyjs) pela incrível UI library
+- [@johnleider](https://github.com/johnleider) e toda a equipe por manter o Vuetify
+- [Vue.js Team](https://github.com/vuejs/core)
+- Comunidade Vue/Vuetify por pacotes e suporte
+
+---
+
+## 📑 Licença
+
+Distribuído sob a licença [MIT](https://opensource.org/licenses/MIT).
+
+---
+
+**Desenvolvido com ❤️ por [@thomazfabio](https://github.com/thomazfabio)**
