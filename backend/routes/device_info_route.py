@@ -3,12 +3,16 @@ from flask import request
 from controllers import device_info_controller
 
 # Criação do Namespace
-ns = Namespace('Device Info', description='Operações relacionadas aos dispositivos')
+ns = Namespace('Manage Device Info', description='Operações relacionadas aos dispositivos')
 
 # Modelo para criação/atualização (exemplo — pode ser ajustado conforme seu schema)
-device_model = ns.model('Device', {
-    'nome': fields.String(required=True, description='Nome do dispositivo'),
-    'tipo': fields.String(required=True, description='Tipo do dispositivo'),
+device_model = ns.model('DeviceCreate', {
+    'id': fields.Integer(description='ID do modelo de dispositivo'),
+    'tipo': fields.String(description='Tipo do dispositivo (ex: câmera, NVR, etc)'),
+    'fabricante': fields.String(description='Fabricante do dispositivo'),
+    'modelo': fields.String(description='Modelo do dispositivo'),
+    'path_rtsp': fields.String(description='Caminho RTSP padrão (ex: /live.sdp)'),
+    'versao': fields.String(description='Versão do dispositivo ou firmware'),
     # Adicione mais campos aqui conforme necessário
 })
 
@@ -16,7 +20,7 @@ device_model = ns.model('Device', {
 @ns.route('/create')
 class CreateDevice(Resource):
     @ns.expect(device_model)
-    @ns.doc(description="Cria um novo dispositivo.")
+    @ns.doc(description="Cria um novo dispositivo (base para a câmera).")
     def post(self):
         data = request.get_json()
         return device_info_controller.create(data)
